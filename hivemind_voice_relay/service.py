@@ -1,20 +1,20 @@
+import base64
 import threading
+from typing import List, Tuple, Optional
 
-from hivemind_bus_client.client import HiveMessageBusClient
-from ovos_dinkum_listener.service import OVOSDinkumVoiceService, DinkumVoiceLoop
-from ovos_utils.log import LOG
+from ovos_audio.service import PlaybackService
+from ovos_bus_client.message import Message, dig_for_message
 from ovos_config.locale import setup_locale
+from ovos_dinkum_listener.plugins import FakeStreamingSTT
+from ovos_dinkum_listener.service import OVOSDinkumVoiceService
 from ovos_plugin_manager.templates.stt import STT
 from ovos_plugin_manager.templates.tts import TTS
 from ovos_plugin_manager.templates.vad import VADEngine
-from typing import List, Tuple, Optional
-from ovos_audio.service import PlaybackService
-from ovos_bus_client.message import Message
 from ovos_plugin_manager.utils.tts_cache import hash_sentence
-import base64
+from ovos_utils.log import LOG
 from speech_recognition import AudioData
-from ovos_dinkum_listener.plugins import FakeStreamingSTT
 
+from hivemind_bus_client.client import HiveMessageBusClient
 
 
 def on_ready():
@@ -53,8 +53,9 @@ class HiveMindSTT(STT):
     def execute(self, audio: AudioData, language: Optional[str] = None) -> str:
         wav = audio.get_wav_data()
         b64audio = base64.b64encode(wav).decode("utf-8")
-        m = Message("recognizer_loop:b64_transcribe",
-                    {"audio": b64audio, "lang": self.lang})
+        m = dig_for_message() or Message("")
+        m = m.forward("recognizer_loop:b64_transcribe",
+                      {"audio": b64audio, "lang": self.lang})
         self._response.clear()
         self._transcripts = []
         self.bus.emit(m)
@@ -71,10 +72,10 @@ class HiveMindSTT(STT):
 
 class AudioPlaybackRelay(PlaybackService):
 
-    def __init__(self,  bus: HiveMessageBusClient, ready_hook=on_ready, error_hook=on_error,
+    def __init__(self, bus: HiveMessageBusClient, ready_hook=on_ready, error_hook=on_error,
                  stopping_hook=on_stopping, alive_hook=on_alive,
                  started_hook=on_started, watchdog=lambda: None):
-        super().__init__(ready_hook,error_hook,stopping_hook, alive_hook, started_hook, watchdog=watchdog,
+        super().__init__(ready_hook, error_hook, stopping_hook, alive_hook, started_hook, watchdog=watchdog,
                          bus=bus, validate_source=False,
                          disable_fallback=True)
         self.bus.on("speak:b64_audio.response", self.handle_tts_b64_response)
@@ -89,8 +90,8 @@ class AudioPlaybackRelay(PlaybackService):
         """
         LOG.info("Speak: " + utterance)
         # request synth in HM master side
-        self.bus.emit(Message('speak:b64_audio',
-                              {"utterance": utterance, "listen": listen}))
+        self.bus.emit(message.forward('speak:b64_audio',
+                                      {"utterance": utterance, "listen": listen}))
 
     def handle_tts_b64_response(self, message: Message):
         LOG.debug("Received TTS audio")
