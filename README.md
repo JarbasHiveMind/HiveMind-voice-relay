@@ -4,7 +4,7 @@ OpenVoiceOS Relay, connect to [HiveMind](https://github.com/JarbasHiveMind/HiveM
 
 Similar to [voice-satellite](https://github.com/JarbasHiveMind/HiveMind-voice-sat), but STT and TTS are sent to HiveMind instead of handled on device
 
-> NOTE: is using ovos-installer for the server this requires the `listener` profile
+> NOTE: if using ovos-installer for the server this requires the `listener` profile
 
 ## Install
 
@@ -45,6 +45,7 @@ Voice relay uses the default OpenVoiceOS configuration `~/.config/mycroft/mycrof
 Supported plugin types:
 - Microphone  (required)
 - VAD  (required)
+- WakeWord (required)
 - Audio Transformers  (optional, None by default)
 - Dialog Transformers  (optional, None by default)
 - TTS Transformers  (optional, None by default)
