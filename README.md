@@ -4,9 +4,11 @@ OpenVoiceOS Relay, connect to [HiveMind](https://github.com/JarbasHiveMind/HiveM
 
 Similar to [voice-satellite](https://github.com/JarbasHiveMind/HiveMind-voice-sat), but STT and TTS are sent to HiveMind instead of handled on device
 
-> NOTE: if using ovos-installer for the server this requires the `listener` profile
+running TTS/STT via hivemind has the advantage of access control, ie, requires an access key to use the plugins vs the non-authenticated public servers
 
 ## Install
+
+> NOTE: if using ovos-installer for the server side, the `listener` profile is required
 
 Install dependencies (if needed)
 
