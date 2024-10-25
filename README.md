@@ -1,51 +1,52 @@
-### HiveMind Server Setups
+# HiveMind Voice Relay
 
-When building your HiveMind servers there are many ways to go about it, with many optional components
+OpenVoiceOS Relay, connect to [HiveMind](https://github.com/JarbasHiveMind/HiveMind-core)
 
-Common setups:
+Similar to [voice-satellite](https://github.com/JarbasHiveMind/HiveMind-voice-sat), but STT and TTS are sent to HiveMind instead of handled on device
 
-- **OVOS Device**, a full OVOS install without hivemind
-- **Hivemind Device**, a OVOS device also running hivemind, eg. a Mark2 with it's own satellites.
-- **Hivemind Skills Server**, a minimal HiveMind server that satellites can connect to, supports **text** utterances
-  only
-- **Hivemind Sound Server**, a HiveMind server that supports **text** utterances and **streaming audio**
-- **Hivemind Persona Server**, exposes a `ovos-persona` (eg. an LLM) that satellites can connect to, without
-  running `ovos-core`.
+> NOTE: if using ovos-installer for the server this requires the `listener` profile
 
-The table below illustrates the most common setups for a OVOS based Mind, each column represents a running OVOS/HiveMind
-service on your server
+## Install
 
-|                             | **hivemind-core** | **hivemind-listener** | **ovos-core** | **ovos-audio** | **ovos-listener** | **hivemind-persona** |
-|-----------------------------|-------------------|-----------------------|---------------|----------------|-------------------|----------------------|
-| **OVOS Device**             | ❌                 | ❌                     | ✔️            | ✔️             | ✔️                | ❌                    | 
-| **Hivemind Device**         | ✔️                | ❌                     | ✔️            | ✔️             | ✔️                | ❌                    | 
-| **Hivemind Skills Server**  | ✔️                | ❌                     | ✔️            | ❌              | ❌                 | ❌                    | 
-| **Hivemind Sound Server**   | ❌                 | ✔️                    | ✔️            | ❌              | ❌                 | ❌                    | 
-| **Hivemind Persona Server** | ❌                 | ❌                     | ❌             | ❌              | ❌                 | ✔️                   | 
+Install dependencies (if needed)
 
-The table below indicates compatibility for each of the setups described above with the most common voice satellites,
-each column corresponds to a different satellite
+```bash
+sudo apt-get install -y libpulse-dev libasound2-dev
+```
 
-|                             | **voice satellite** | **voice relay** | **mic satellite** |
-|-----------------------------|---------------------|-----------------|-------------------|
-| **OVOS Device**             | ❌                   | ❌               | ❌                 |
-| **Hivemind Device**         | ✔️                  | ✔️              | ❌                 |
-| **Hivemind Skills Server**  | ✔️                  | ❌               | ❌                 |
-| **Hivemind Sound Server**   | ✔️                  | ✔️              | ✔️                |
-| **Hivemind Persona Server** | ✔️                  | ❌               | ❌                 |
+Install with pip
 
-### HiveMind Satellites
+```bash
+$ pip install git+https://github.com/JarbasHiveMind/HiveMind-voice-relay
+```
 
-The table below illustrates how plugins from the OVOS ecosystem relate to the various satellites
+## Usage
 
-**Emoji Key**
+```bash
+Usage: hivemind-voice-relay [OPTIONS]
 
-- ✔️: Local (on device)
-- 📡: Remote (hivemind-listener)
-- ❌: Unsupported
+  connect to HiveMind
 
-| Supported Plugins                 | **Microphone**   | **VAD**          | **Wake Word**    | **STT**          | **TTS**          | **Media Playback** | **Transformers**   | **PHAL**           |
-|-----------------------------------|------------------|------------------|------------------|------------------|------------------|--------------------|--------------------|--------------------|
-| **HiveMind Voice Satellite**      | ✔️<br>(Required) | ✔️<br>(Required) | ✔️<br>(Required) | ✔️<br>(Required) | ✔️<br>(Required) | ✔️<br>(Optional)   | ✔️<br>(Optional)   | ✔️<br>(Optional)   |
-| **HiveMind Voice Relay**          | ✔️<br>(Required) | ✔️<br>(Required) | ✔️<br>(Required) | 📡<br>(Remote)   | 📡<br>(Remote)   | ✔️<br>(Optional)   | ✔️<br>(Optional)   | ✔️<br>(Optional)   |
-| **HiveMind Microphone Satellite** | ✔️<br>(Required) | ✔️<br>(Required) | 📡<br>(Remote)   | 📡<br>(Remote)   | 📡<br>(Remote)   | ❌<br>(Unsupported) | ❌<br>(Unsupported) | ❌<br>(Unsupported) |
+Options:
+  --host TEXT      hivemind host
+  --key TEXT       Access Key
+  --password TEXT  Password for key derivation
+  --port INTEGER   HiveMind port number
+  --selfsigned     accept self signed certificates
+  --help           Show this message and exit.
+
+```
+
+
+## Configuration
+
+Voice relay uses the default OpenVoiceOS configuration `~/.config/mycroft/mycroft.conf`
+
+Supported plugin types:
+- Microphone  (required)
+- VAD  (required)
+- WakeWord (required)
+- Audio Transformers  (optional, None by default)
+- Dialog Transformers  (optional, None by default)
+- TTS Transformers  (optional, None by default)
+- PHAL  (optional, None by default)
