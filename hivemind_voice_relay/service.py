@@ -5,6 +5,7 @@ from typing import List, Tuple, Optional
 import speech_recognition as sr
 from ovos_audio.service import PlaybackService
 from ovos_bus_client.message import Message, dig_for_message
+from ovos_config import Configuration
 from ovos_plugin_manager.microphone import OVOSMicrophoneFactory
 from ovos_plugin_manager.templates.stt import STT
 from ovos_plugin_manager.templates.tts import TTS
@@ -88,7 +89,7 @@ class HMCallbacks(ListenerCallbacks):
     def text_callback(self, utterance: str, lang: str):
         LOG.info(f"STT: {utterance}")
         self.bus.emit(Message("recognizer_loop:utterance",
-                              {"utterances": utterance, "lang": lang}))
+                              {"utterances": [utterance], "lang": lang}))
 
 
 class HiveMindSTT(STT):
@@ -173,10 +174,11 @@ class HiveMindVoiceRelay(SimpleListener):
     def __init__(self, bus: Optional[HiveMessageBusClient] = None):
         self.bus = bus or get_bus()
         self.audio = HMPlayback(bus=self.bus)
+        ww = Configuration().get("listener", {}).get("wake_word", "hey_mycroft")
         super().__init__(
             mic=OVOSMicrophoneFactory.create(),
             vad=OVOSVADFactory.create(),
-            wakeword=OVOSWakeWordFactory.create_hotword("hey_mycroft"),
+            wakeword=OVOSWakeWordFactory.create_hotword(ww),
             stt=HiveMindSTT(self.bus),
             callbacks=HMCallbacks(self.bus)
         )
