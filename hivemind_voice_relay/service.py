@@ -2,19 +2,49 @@ import base64
 import threading
 from typing import List, Tuple, Optional
 
+import speech_recognition as sr
 from ovos_audio.service import PlaybackService
 from ovos_bus_client.message import Message, dig_for_message
-from ovos_config.locale import setup_locale
-from ovos_dinkum_listener.plugins import FakeStreamingSTT
-from ovos_dinkum_listener.service import OVOSDinkumVoiceService
+from ovos_config import Configuration
+from ovos_plugin_manager.microphone import OVOSMicrophoneFactory
 from ovos_plugin_manager.templates.stt import STT
 from ovos_plugin_manager.templates.tts import TTS
-from ovos_plugin_manager.templates.vad import VADEngine
 from ovos_plugin_manager.utils.tts_cache import hash_sentence
+from ovos_plugin_manager.vad import OVOSVADFactory
+from ovos_plugin_manager.wakewords import OVOSWakeWordFactory
+from ovos_simple_listener import ListenerCallbacks, SimpleListener
+from ovos_utils.fakebus import FakeBus
 from ovos_utils.log import LOG
 from speech_recognition import AudioData
 
 from hivemind_bus_client.client import HiveMessageBusClient
+from hivemind_bus_client.identity import NodeIdentity
+
+
+def get_bus() -> HiveMessageBusClient:
+    # TODO - kwargs
+    identity = NodeIdentity()
+    siteid = identity.site_id or "unknown"
+    host = identity.default_master
+    port = 5678
+
+    if not identity.access_key or not identity.password or not host:
+        raise RuntimeError("NodeIdentity not set, please pass key/password/host or "
+                           "call 'hivemind-client set-identity'")
+
+    if not host.startswith("ws://") and not host.startswith("wss://"):
+        host = "ws://" + host
+    if not host.startswith("ws"):
+        raise ValueError(f"Invalid host, please specify a protocol: 'ws://{host}' or 'wss://{host}'")
+
+    bus = HiveMessageBusClient(key=identity.access_key,
+                               password=identity.password,
+                               port=port,
+                               host=host,
+                               useragent="VoiceRelayV1.0.0",
+                               internal_bus=FakeBus())
+    bus.connect(site_id=siteid)
+    return bus
 
 
 def on_ready():
@@ -35,6 +65,31 @@ def on_stopping():
 
 def on_error(e='Unknown'):
     LOG.error(f'HiveMind Voice Relay failed to launch ({e}).')
+
+
+class HMCallbacks(ListenerCallbacks):
+    def __init__(self, bus: Optional[HiveMessageBusClient] = None):
+        self.bus = bus or get_bus()
+
+    def listen_callback(self):
+        LOG.info("New loop state: IN_COMMAND")
+        self.bus.internal_bus.emit(Message("mycroft.audio.play_sound",
+                                           {"uri": "snd/start_listening.wav"}))
+        self.bus.internal_bus.emit(Message("recognizer_loop:wakeword"))
+        self.bus.internal_bus.emit(Message("recognizer_loop:record_begin"))
+
+    def end_listen_callback(self):
+        LOG.info("New loop state: WAITING_WAKEWORD")
+        self.bus.internal_bus.emit(Message("recognizer_loop:record_end"))
+
+    def error_callback(self, audio: sr.AudioData):
+        LOG.error("STT Failure")
+        self.bus.internal_bus.emit(Message("recognizer_loop:speech.recognition.unknown"))
+
+    def text_callback(self, utterance: str, lang: str):
+        LOG.info(f"STT: {utterance}")
+        self.bus.emit(Message("recognizer_loop:utterance",
+                              {"utterances": [utterance], "lang": lang}))
 
 
 class HiveMindSTT(STT):
@@ -70,8 +125,7 @@ class HiveMindSTT(STT):
             return ""
 
 
-class AudioPlaybackRelay(PlaybackService):
-
+class HMPlayback(PlaybackService):
     def __init__(self, bus: HiveMessageBusClient, ready_hook=on_ready, error_hook=on_error,
                  stopping_hook=on_stopping, alive_hook=on_alive,
                  started_hook=on_started, watchdog=lambda: None):
@@ -79,8 +133,10 @@ class AudioPlaybackRelay(PlaybackService):
                          bus=bus, validate_source=False,
                          disable_fallback=True)
         self.bus.on("speak:b64_audio.response", self.handle_tts_b64_response)
+        self.start()
 
-    def execute_tts(self, utterance, ident, listen=False, message: Message = None):
+    def execute_tts(self, utterance, ident, listen=False,
+                    message: Message = None):
         """Mute mic and start speaking the utterance using selected tts backend.
 
         Args:
@@ -109,31 +165,29 @@ class AudioPlaybackRelay(PlaybackService):
         )
 
     def handle_b64_audio(self, message):
-        pass  # handled in master, not client
-
-    def _maybe_reload_tts(self):
-        # skip loading TTS in this subclass
+        # HACK: dont get in a infinite loop, this message is meant for master
+        # because of how HiveMindTTS is implemented we need to do this
         pass
 
 
-class VoiceRelay(OVOSDinkumVoiceService):
-    """HiveMind Voice Relay, but bus is replaced with hivemind connection"""
+class HiveMindVoiceRelay(SimpleListener):
+    def __init__(self, bus: Optional[HiveMessageBusClient] = None):
+        self.bus = bus or get_bus()
+        self.audio = HMPlayback(bus=self.bus)
+        ww = Configuration().get("listener", {}).get("wake_word", "hey_mycroft")
+        super().__init__(
+            mic=OVOSMicrophoneFactory.create(),
+            vad=OVOSVADFactory.create(),
+            wakeword=OVOSWakeWordFactory.create_hotword(ww),
+            stt=HiveMindSTT(self.bus),
+            callbacks=HMCallbacks(self.bus)
+        )
 
-    def __init__(self, bus: HiveMessageBusClient, on_ready=on_ready, on_error=on_error,
-                 on_stopping=on_stopping, on_alive=on_alive,
-                 on_started=on_started, watchdog=lambda: None, mic=None,
-                 vad: Optional[VADEngine] = None):
-        setup_locale()  # read mycroft.conf for default lang/timezone in all modules (eg, lingua_franca)
-        stt = FakeStreamingSTT(HiveMindSTT(bus=bus))
-        super().__init__(on_ready, on_error, on_stopping, on_alive, on_started, watchdog, mic,
-                         stt=stt, vad=vad,
-                         bus=bus, validate_source=False, disable_fallback=True)
 
-    def _handle_b64_transcribe(self, message: Message):
-        pass  # handled in master, not client
+def main():
+    t = HiveMindVoiceRelay()
+    t.run()
 
-    def _connect_to_bus(self):
-        pass
 
-    def reload_configuration(self):
-        pass
+if __name__ == "__main__":
+    main()

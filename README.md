@@ -1,51 +1,71 @@
-### HiveMind Server Setups
+# HiveMind Voice Relay
 
-When building your HiveMind servers there are many ways to go about it, with many optional components
+OpenVoiceOS Relay, connect to [HiveMind](https://github.com/JarbasHiveMind/HiveMind-listener)
 
-Common setups:
+A lightweight version of [voice-satellite](https://github.com/JarbasHiveMind/HiveMind-voice-sat), but STT and TTS are sent to HiveMind instead of handled on device
 
-- **OVOS Device**, a full OVOS install without hivemind
-- **Hivemind Device**, a OVOS device also running hivemind, eg. a Mark2 with it's own satellites.
-- **Hivemind Skills Server**, a minimal HiveMind server that satellites can connect to, supports **text** utterances
-  only
-- **Hivemind Sound Server**, a HiveMind server that supports **text** utterances and **streaming audio**
-- **Hivemind Persona Server**, exposes a `ovos-persona` (eg. an LLM) that satellites can connect to, without
-  running `ovos-core`.
+## Server requirements
 
-The table below illustrates the most common setups for a OVOS based Mind, each column represents a running OVOS/HiveMind
-service on your server
+> ⚠️ `hivemind-listener` is required server side, the default `hivemind-core` does not provide STT and TTS capabilities.
 
-|                             | **hivemind-core** | **hivemind-listener** | **ovos-core** | **ovos-audio** | **ovos-listener** | **hivemind-persona** |
-|-----------------------------|-------------------|-----------------------|---------------|----------------|-------------------|----------------------|
-| **OVOS Device**             | ❌                 | ❌                     | ✔️            | ✔️             | ✔️                | ❌                    | 
-| **Hivemind Device**         | ✔️                | ❌                     | ✔️            | ✔️             | ✔️                | ❌                    | 
-| **Hivemind Skills Server**  | ✔️                | ❌                     | ✔️            | ❌              | ❌                 | ❌                    | 
-| **Hivemind Sound Server**   | ❌                 | ✔️                    | ✔️            | ❌              | ❌                 | ❌                    | 
-| **Hivemind Persona Server** | ❌                 | ❌                     | ❌             | ❌              | ❌                 | ✔️                   | 
+> Alternatively run `hivemind-core` together with `ovos-audio` and `ovos-dinkum-listener`
 
-The table below indicates compatibility for each of the setups described above with the most common voice satellites,
-each column corresponds to a different satellite
+The regular voice satellite is built on top of [ovos-dinkum-listener](https://github.com/OpenVoiceOS/ovos-dinkum-listener) and is full featured supporting all plugins
 
-|                             | **voice satellite** | **voice relay** | **mic satellite** |
-|-----------------------------|---------------------|-----------------|-------------------|
-| **OVOS Device**             | ❌                   | ❌               | ❌                 |
-| **Hivemind Device**         | ✔️                  | ✔️              | ❌                 |
-| **Hivemind Skills Server**  | ✔️                  | ❌               | ❌                 |
-| **Hivemind Sound Server**   | ✔️                  | ✔️              | ✔️                |
-| **Hivemind Persona Server** | ✔️                  | ❌               | ❌                 |
+This repo is built on top of [ovos-simple-listener](https://github.com/TigreGotico/ovos-simple-listener), while it needs less resources it is also **missing** some features
 
-### HiveMind Satellites
+- STT plugin
+- TTS plugin
+- Audio Transformers plugins
+- Continuous Listening
+- Hybrid Listening
+- Recording Mode
+- Sleep Mode
+- Multiple WakeWords
 
-The table below illustrates how plugins from the OVOS ecosystem relate to the various satellites
+If you need an even lighter implementation, consider [hivemind-mic-satellite](https://github.com/JarbasHiveMind/hivemind-mic-satellite) to also offload wake word to the server
 
-**Emoji Key**
+## Install
 
-- ✔️: Local (on device)
-- 📡: Remote (hivemind-listener)
-- ❌: Unsupported
+Install with pip
 
-| Supported Plugins                 | **Microphone**   | **VAD**          | **Wake Word**    | **STT**          | **TTS**          | **Media Playback** | **Transformers**   | **PHAL**           |
-|-----------------------------------|------------------|------------------|------------------|------------------|------------------|--------------------|--------------------|--------------------|
-| **HiveMind Voice Satellite**      | ✔️<br>(Required) | ✔️<br>(Required) | ✔️<br>(Required) | ✔️<br>(Required) | ✔️<br>(Required) | ✔️<br>(Optional)   | ✔️<br>(Optional)   | ✔️<br>(Optional)   |
-| **HiveMind Voice Relay**          | ✔️<br>(Required) | ✔️<br>(Required) | ✔️<br>(Required) | 📡<br>(Remote)   | 📡<br>(Remote)   | ✔️<br>(Optional)   | ✔️<br>(Optional)   | ✔️<br>(Optional)   |
-| **HiveMind Microphone Satellite** | ✔️<br>(Required) | ✔️<br>(Required) | 📡<br>(Remote)   | 📡<br>(Remote)   | 📡<br>(Remote)   | ❌<br>(Unsupported) | ❌<br>(Unsupported) | ❌<br>(Unsupported) |
+```bash
+$ pip install HiveMind-voice-relay
+```
+
+## Usage
+
+```bash
+Usage: hivemind-voice-relay [OPTIONS]
+
+  connect to HiveMind
+
+Options:
+  --host TEXT      hivemind host
+  --key TEXT       Access Key
+  --password TEXT  Password for key derivation
+  --port INTEGER   HiveMind port number
+  --selfsigned     accept self signed certificates
+  --help           Show this message and exit.
+
+```
+
+## Configuration
+
+Voice relay is built on top of [ovos-simple-listener](https://github.com/TigreGotico/ovos-simple-listener) and [ovos-audio](https://github.com/OpenVoiceOS/ovos-audio), it uses the default OpenVoiceOS configuration `~/.config/mycroft/mycroft.conf`
+
+Supported plugin types:
+
+| Plugin Type | Description | Required | Link |
+|-------------|-------------|----------|------|
+| Microphone | Captures voice input | Yes | [Microphone](https://openvoiceos.github.io/ovos-technical-manual/mic_plugins/) |
+| VAD | Voice Activity Detection | Yes | [VAD](https://openvoiceos.github.io/ovos-technical-manual/vad_plugins/) |
+| WakeWord | Detects wake words for interaction | Yes* | [WakeWord](https://openvoiceos.github.io/ovos-technical-manual/ww_plugins/) |
+| STT | speech-to-text (STT)| Yes | [STT](https://openvoiceos.github.io/ovos-technical-manual/stt_plugins/) |
+| TTS | text-to-speech (TTS) | Yes | [TTS](https://openvoiceos.github.io/ovos-technical-manual/tts_plugins) |
+| G2P | grapheme-to-phoneme (G2P), used to simulate mouth movements  | No | [G2P](https://openvoiceos.github.io/ovos-technical-manual/g2p_plugins) |
+| Media Playback Plugins | Enables media playback (e.g., "play Metallica") | No | [Media Playback Plugins](https://openvoiceos.github.io/ovos-technical-manual/media_plugins/) |
+| OCP Plugins | Provides playback support for URLs (e.g., YouTube) | No | [OCP Plugins](https://openvoiceos.github.io/ovos-technical-manual/ocp_plugins/) |
+| Dialog Transformers | Processes text before text-to-speech (TTS) | No | [Dialog Transformers](https://openvoiceos.github.io/ovos-technical-manual/transformer_plugins/) |
+| TTS Transformers | Processes audio after text-to-speech (TTS) | No | [TTS Transformers](https://openvoiceos.github.io/ovos-technical-manual/transformer_plugins/) |
+| PHAL | Provides platform-specific support (e.g., Mark 1) | No | [PHAL](https://openvoiceos.github.io/ovos-technical-manual/PHAL/) |
