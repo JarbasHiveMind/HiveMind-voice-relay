@@ -1,4 +1,4 @@
-import base64
+import pybase64
 import threading
 from typing import List, Tuple, Optional
 
@@ -107,7 +107,7 @@ class HiveMindSTT(STT):
 
     def execute(self, audio: AudioData, language: Optional[str] = None) -> str:
         wav = audio.get_wav_data()
-        b64audio = base64.b64encode(wav).decode("utf-8")
+        b64audio = pybase64.b64encode(wav).decode("utf-8")
         m = dig_for_message() or Message("")
         m = m.forward("recognizer_loop:b64_transcribe",
                       {"audio": b64audio, "lang": self.lang})
@@ -157,7 +157,7 @@ class HMPlayback(PlaybackService):
         tts_id = message.data.get("tts_id", "b64TTS")
         audio_file = f"/tmp/{hash_sentence(utt)}.wav"
         with open(audio_file, "wb") as f:
-            f.write(base64.b64decode(b64data))
+            f.write(pybase64.b64decode(b64data))
 
         # queue audio for playback
         TTS.queue.put(

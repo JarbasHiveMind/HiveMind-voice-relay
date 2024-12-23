@@ -1,12 +1,20 @@
 # Changelog
 
-## [1.0.0a1](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.0.0a1) (2024-10-26)
+## [1.0.1a2](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.0.1a2) (2024-12-23)
 
-[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/0.1.0...1.0.0a1)
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.0.1a1...1.0.1a2)
 
-**Breaking changes:**
+**Merged pull requests:**
 
-- feat!:move to simple listener [\#1](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/1) ([JarbasAl](https://github.com/JarbasAl))
+- performance: speed up b64 operations [\#5](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/5) ([JarbasAl](https://github.com/JarbasAl))
+
+## [1.0.1a1](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.0.1a1) (2024-12-21)
+
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.0.0...1.0.1a1)
+
+**Merged pull requests:**
+
+- fix: port from identity file [\#3](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/3) ([JarbasAl](https://github.com/JarbasAl))
 
 
 

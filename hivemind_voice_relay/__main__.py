@@ -13,7 +13,7 @@ from hivemind_voice_relay.service import HiveMindVoiceRelay
 @click.option("--host", help="hivemind host", type=str, default="")
 @click.option("--key", help="Access Key", type=str, default="")
 @click.option("--password", help="Password for key derivation", type=str, default="")
-@click.option("--port", help="HiveMind port number", type=int, default=5678)
+@click.option("--port", help="HiveMind port number", type=int, required=False)
 @click.option("--selfsigned", help="accept self signed certificates", is_flag=True)
 @click.option("--siteid", help="location identifier for message.context", type=str, default="")
 def connect(host, key, password, port, selfsigned, siteid):
@@ -24,6 +24,7 @@ def connect(host, key, password, port, selfsigned, siteid):
     key = key or identity.access_key
     siteid = siteid or identity.site_id or "unknown"
     host = host or identity.default_master
+    port = port or identity.default_port or 5678
 
     if not key or not password or not host:
         raise RuntimeError("NodeIdentity not set, please pass key/password/host or "
