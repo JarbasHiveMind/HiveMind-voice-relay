@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.1a2](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.0.1a2) (2024-12-23)
+
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.0.1a1...1.0.1a2)
+
+**Merged pull requests:**
+
+- performance: speed up b64 operations [\#5](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/5) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [1.0.1a1](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.0.1a1) (2024-12-21)
 
 [Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.0.0...1.0.1a1)
