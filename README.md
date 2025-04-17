@@ -58,12 +58,12 @@ Supported plugin types:
 
 | Plugin Type | Description | Required | Link |
 |-------------|-------------|----------|------|
-| Microphone | Captures voice input | Yes | [Microphone](https://openvoiceos.github.io/ovos-technical-manual/mic_plugins/) |
-| VAD | Voice Activity Detection | Yes | [VAD](https://openvoiceos.github.io/ovos-technical-manual/vad_plugins/) |
-| WakeWord | Detects wake words for interaction | Yes | [WakeWord](https://openvoiceos.github.io/ovos-technical-manual/ww_plugins/) |
-| G2P | grapheme-to-phoneme (G2P), used to simulate mouth movements  | No | [G2P](https://openvoiceos.github.io/ovos-technical-manual/g2p_plugins) |
-| Media Playback Plugins | Enables media playback (e.g., "play Metallica") | No | [Media Playback Plugins](https://openvoiceos.github.io/ovos-technical-manual/media_plugins/) |
-| OCP Plugins | Provides playback support for URLs (e.g., YouTube) | No | [OCP Plugins](https://openvoiceos.github.io/ovos-technical-manual/ocp_plugins/) |
-| Dialog Transformers | Processes text before text-to-speech (TTS) | No | [Dialog Transformers](https://openvoiceos.github.io/ovos-technical-manual/transformer_plugins/) |
-| TTS Transformers | Processes audio after text-to-speech (TTS) | No | [TTS Transformers](https://openvoiceos.github.io/ovos-technical-manual/transformer_plugins/) |
-| PHAL | Provides platform-specific support (e.g., Mark 1) | No | [PHAL](https://openvoiceos.github.io/ovos-technical-manual/PHAL/) |
+| Microphone | Captures voice input | Yes | [Microphone](https://openvoiceos.github.io/ovos-technical-manual//310-mic_plugins/#microphone-plugins) |
+| VAD | Voice Activity Detection | Yes | [VAD](https://openvoiceos.github.io/ovos-technical-manual//311-vad_plugins/#list-of-vad-plugins) |
+| WakeWord | Detects wake words for interaction | Yes | [WakeWord](https://openvoiceos.github.io/ovos-technical-manual//312-wake_word_plugins/#list-of-wake-word-plugins) |
+| G2P | grapheme-to-phoneme (G2P), used to simulate mouth movements  | No | [G2P](https://openvoiceos.github.io/ovos-technical-manual//321-g2p_plugins/) |
+| Media Playback Plugins | Enables media playback (e.g., "play Metallica") | No | [Media Playback Plugins](https://openvoiceos.github.io/ovos-technical-manual/371-media_plugins/) |
+| OCP Plugins | Provides playback support for URLs (e.g., YouTube) | No | [OCP Plugins](https://openvoiceos.github.io/ovos-technical-manual/370-ocp_plugins/) |
+| Dialog Transformers | Processes text before text-to-speech (TTS) | No | [Dialog Transformers](https://openvoiceos.github.io/ovos-technical-manual/330-transformer_plugins/) |
+| TTS Transformers | Processes audio after text-to-speech (TTS) | No | [TTS Transformers](https://openvoiceos.github.io/ovos-technical-manual/103-audio_service/#transformer-plugins) |
+| PHAL | Provides platform-specific support (e.g., Mark 1) | No | [PHAL](https://openvoiceos.github.io/ovos-technical-manual/340-PHAL/#plugins)
