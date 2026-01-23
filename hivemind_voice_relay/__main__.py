@@ -17,6 +17,22 @@ from hivemind_voice_relay.service import HiveMindVoiceRelay
 @click.option("--selfsigned", help="accept self signed certificates", is_flag=True)
 @click.option("--siteid", help="location identifier for message.context", type=str, default="")
 def connect(host, key, password, port, selfsigned, siteid):
+    """
+    Start and run the HiveMind Voice Relay service using provided or stored node identity.
+    
+    This function initializes logging, resolves missing credentials from the local NodeIdentity, validates and normalizes the host and port, connects to the HiveMind message bus, starts the voice relay service in a daemon thread, optionally starts PHAL if available, and blocks until an exit signal is received; on exit it stops the relay and shuts down PHAL if started.
+    
+    Parameters:
+        host (str): WebSocket URL or hostname of the HiveMind master (scheme will be prefixed if missing).
+        key (str): Access key for the node; if omitted the value from NodeIdentity is used.
+        password (str): Password for the node; if omitted the value from NodeIdentity is used.
+        port (int): Port to connect to; if omitted the value from NodeIdentity or 5678 is used.
+        selfsigned (bool): Allow connecting to a server with a self-signed TLS certificate when True.
+        siteid (str): Site identifier to register with the bus; if omitted the value from NodeIdentity or "unknown" is used.
+    
+    Raises:
+        RuntimeError: If key, password, or host are not available from arguments or NodeIdentity.
+    """
     init_service_logger("HiveMind-voice-relay")
 
     identity = NodeIdentity()
