@@ -5,6 +5,7 @@ from ovos_utils.log import init_service_logger, LOG
 
 from hivemind_bus_client import HiveMessageBusClient
 from hivemind_bus_client.identity import NodeIdentity
+from ovos_bus_client.session import Session
 from hivemind_voice_relay.service import HiveMindVoiceRelay
 
 
@@ -38,16 +39,13 @@ def connect(host, key, password, port, selfsigned, siteid):
         LOG.error(f"ws://{host} or wss://{host}")
         exit(1)
 
-    internal_bus = FakeBus()
-
     # connect to hivemind
     bus = HiveMessageBusClient(key=key,
                                password=password,
                                port=port,
                                host=host,
                                useragent="VoiceRelayV1.0.0",
-                               self_signed=selfsigned,
-                               internal_bus=internal_bus)
+                               self_signed=selfsigned)
     bus.connect(site_id=siteid)
 
     # STT listener thread
