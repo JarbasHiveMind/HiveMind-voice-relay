@@ -5,7 +5,6 @@ from ovos_utils.log import init_service_logger, LOG
 
 from hivemind_bus_client import HiveMessageBusClient
 from hivemind_bus_client.identity import NodeIdentity
-from ovos_bus_client.session import Session
 from hivemind_voice_relay.service import HiveMindVoiceRelay
 
 
