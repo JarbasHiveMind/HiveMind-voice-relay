@@ -1,21 +1,13 @@
 # Changelog
 
-## [1.0.3a1](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.0.3a1) (2026-01-23)
+## [1.0.4a1](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.0.4a1) (2026-02-03)
 
-[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.0.2a1...1.0.3a1)
-
-**Merged pull requests:**
-
-- fix: session\_id [\#15](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/15) ([JarbasAl](https://github.com/JarbasAl))
-
-## [1.0.2a1](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.0.2a1) (2025-12-18)
-
-[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.0.1...1.0.2a1)
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.0.3...1.0.4a1)
 
 **Merged pull requests:**
 
-- chore: Configure Renovate [\#9](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/9) ([renovate[bot]](https://github.com/apps/renovate))
-- Update README.md [\#7](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/7) ([timonvanhasselt](https://github.com/timonvanhasselt))
+- chore\(deps\): update actions/setup-python action to v6 [\#14](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/14) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update actions/checkout action to v6 [\#12](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/12) ([renovate[bot]](https://github.com/apps/renovate))
 
 
 
