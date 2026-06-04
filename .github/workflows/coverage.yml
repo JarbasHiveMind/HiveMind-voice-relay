@@ -12,6 +12,7 @@ jobs:
       python_version: '3.11'
       coverage_source: 'hivemind_voice_relay'
       test_path: 'tests/'
-      # hivescope pin: revert to released hivescope once fix/acl-resolve-user merges
-      pre_install_pip: '"hivescope @ git+https://github.com/JarbasHiveMind/hivescope@fix/acl-resolve-user"'
+      system_deps: 'libasound2-dev'
+      # policy-stack pin: switch hivemind-core to released once #89 merges to dev
+      pre_install_pip: '"hivescope==0.2.2a1" "hivemind-plugin-manager==0.6.0a1" "hivemind-ovos-agent-plugin==0.2.0a1" "hivemind-core @ git+https://github.com/JarbasHiveMind/HiveMind-core@feat/policy-chain-runner"'
       min_coverage: 0

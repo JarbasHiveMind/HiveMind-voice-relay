@@ -8,3 +8,5 @@ on:
 jobs:
   license_check:
     uses: OpenVoiceOS/gh-automations/.github/workflows/license-check.yml@dev
+    with:
+      system_deps: 'libasound2-dev'

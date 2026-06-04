@@ -47,12 +47,10 @@ setup(
     packages=['hivemind_voice_relay'],
     install_requires=required("requirements.txt"),
     extras_require={
-        # hivescope pin: revert to released hivescope once
-        # JarbasHiveMind/hivescope@fix/acl-resolve-user merges to dev
         "test": [
             "pytest",
             "pytest-timeout",
-            "hivescope @ git+https://github.com/JarbasHiveMind/hivescope@fix/acl-resolve-user",
+            "hivescope==0.2.2a1",
         ],
     },
     include_package_data=True,
