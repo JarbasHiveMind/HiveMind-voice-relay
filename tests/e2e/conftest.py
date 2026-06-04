@@ -1,1 +1,1 @@
-pytest_plugins = ['hivescope.pytest_fixtures']
+# pytest_plugins declared in tests/conftest.py (top-level) per pytest convention
