@@ -1,15 +1,17 @@
-name: Build Tests
+name: Code Coverage
 
 on:
   pull_request:
-    branches: [dev, master]
+    branches: [dev]
   workflow_dispatch:
 
 jobs:
-  build:
-    uses: OpenVoiceOS/gh-automations/.github/workflows/build-tests.yml@dev
+  coverage:
+    uses: OpenVoiceOS/gh-automations/.github/workflows/coverage.yml@dev
     with:
-      python_versions: '["3.10", "3.11", "3.12", "3.13"]'
+      python_version: '3.11'
+      coverage_source: 'hivemind_voice_relay'
+      test_path: 'tests/'
       # hivescope pin: revert to released hivescope once fix/acl-resolve-user merges
       pre_install_pip: '"hivescope @ git+https://github.com/JarbasHiveMind/hivescope@fix/acl-resolve-user"'
-      test_path: 'tests/'
+      min_coverage: 0

@@ -1,5 +1,6 @@
-hivemind_bus_client>=0.0.4
-ovos-audio
+hivemind_bus_client>=0.4.4,<1.0.0
+ovos-audio>=1.2.0,<2.0.0
+ovos-plugin-manager>=2.2.0,<3.0.0
 ovos-simple-listener>=0.1.0,<1.0.0
 ovos-microphone-plugin-alsa
 ovos-vad-plugin-silero
