@@ -1,69 +1,138 @@
 # HiveMind Voice Relay
 
-OpenVoiceOS Relay, connect to [HiveMind](https://github.com/JarbasHiveMind/HiveMind-listener)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/HiveMind-voice-relay)](https://pypi.org/project/HiveMind-voice-relay/)
+[![Python](https://img.shields.io/pypi/pyversions/HiveMind-voice-relay)](https://pypi.org/project/HiveMind-voice-relay/)
 
-A lightweight version of [voice-satellite](https://github.com/JarbasHiveMind/HiveMind-voice-sat), but STT and TTS are sent to HiveMind instead of handled on device
+**Local wakeword detection; STT and TTS handled remotely by HiveMind-listener.**
+
+Voice Relay runs the microphone, VAD, and wakeword engine on-device — keeping wake-word detection private and low-latency — while forwarding audio to a **HiveMind-listener** server for speech-to-text, and receiving synthesised audio back for playback. No STT or TTS models run on the device.
+
+> Full documentation: **[docs/](docs/index.md)**
+
+---
+
+## Satellite spectrum
+
+| Satellite | Mic | VAD | Wake word | STT | TTS | Connects to |
+|---|---|---|---|---|---|---|
+| [HiveMind-cli](https://github.com/JarbasHiveMind/HiveMind-cli) | — | — | — | — | — | hivemind-core |
+| [hivemind-mic-satellite](https://github.com/JarbasHiveMind/hivemind-mic-satellite) | local | local | **server** | server | server | HiveMind-listener |
+| **HiveMind-voice-relay** (this repo) | local | local | **local** | server | server | **HiveMind-listener** |
+| [HiveMind-voice-sat](https://github.com/JarbasHiveMind/HiveMind-voice-sat) | local | local | local | local | local | hivemind-core |
+
+Voice Relay is the middle-ground: wakeword detection stays on-device (low latency, no audio leaves until activation), while the heavier STT and TTS models run on the server.
+
+---
 
 ## Server requirements
 
-> ⚠️ `hivemind-listener` is required server side, the default `hivemind-core` does not provide STT and TTS capabilities.
+> ⚠️ **This satellite requires [HiveMind-listener](https://github.com/JarbasHiveMind/HiveMind-listener) on the server.** Plain `hivemind-core` does not handle STT or TTS — connecting to it will result in silence (no transcription, no spoken response).
+>
+> Alternatively, run `hivemind-core` together with `ovos-audio` and `ovos-dinkum-listener` to provide the same capabilities.
 
-> Alternatively run `hivemind-core` together with `ovos-audio` and `ovos-dinkum-listener`
-
-The regular voice satellite is built on top of [ovos-dinkum-listener](https://github.com/OpenVoiceOS/ovos-dinkum-listener) and is full featured supporting all plugins
-
-This repo is built on top of [ovos-simple-listener](https://github.com/TigreGotico/ovos-simple-listener), while it needs less resources it is also **missing** some features
-
-- STT plugin
-- TTS plugin
-- Audio Transformers plugins
-- Continuous Listening
-- Hybrid Listening
-- Recording Mode
-- Sleep Mode
-- Multiple WakeWords
-
-If you need an even lighter implementation, consider [hivemind-mic-satellite](https://github.com/JarbasHiveMind/hivemind-mic-satellite) to also offload wake word to the server
+---
 
 ## Install
 
-Install with pip
-
 ```bash
-$ pip install HiveMind-voice-relay
+pip install HiveMind-voice-relay
 ```
 
-## Usage
+---
+
+## 60-second quickstart
+
+**1. Configure identity** (one-time):
 
 ```bash
+hivemind-client set-identity --key YOUR_ACCESS_KEY --password YOUR_PASSWORD --host wss://your-listener-host
+```
+
+**2. Run:**
+
+```bash
+hivemind-voice-relay
+```
+
+**3. Speak your wake word.** The default wake word is `hey mycroft` (configured in `~/.config/mycroft/mycroft.conf`).
+
+---
+
+## CLI flags
+
+```
 Usage: hivemind-voice-relay [OPTIONS]
 
-  connect to HiveMind
+  connect to HiveMind Sound Server
 
 Options:
-  --host TEXT      hivemind host
+  --host TEXT      hivemind host (ws:// or wss://)
   --key TEXT       Access Key
   --password TEXT  Password for key derivation
-  --port INTEGER   HiveMind port number
-  --selfsigned     accept self signed certificates
+  --port INTEGER   HiveMind port number (default: 5678)
+  --selfsigned     Accept self-signed TLS certificates
+  --siteid TEXT    Location identifier for message context
   --help           Show this message and exit.
-
 ```
+
+All flags fall back to values stored by `hivemind-client set-identity`.
+
+---
 
 ## Configuration
 
-Voice relay is built on top of [ovos-simple-listener](https://github.com/TigreGotico/ovos-simple-listener) and [ovos-audio](https://github.com/OpenVoiceOS/ovos-audio), it uses the default OpenVoiceOS configuration `~/.config/mycroft/mycroft.conf`
+Voice Relay reads `~/.config/mycroft/mycroft.conf` (standard OVOS config).
 
-Supported plugin types:
+| Plugin type | Config key | Default | Required |
+|---|---|---|---|
+| Microphone | `microphone.module` | `ovos-microphone-plugin-alsa` | Yes |
+| VAD | `listener.VAD.module` | `ovos-vad-plugin-silero` | Yes |
+| Wake word | `listener.wake_word` | `hey_mycroft` | Yes |
+| G2P | `tts.g2p_module` | — | No |
+| Media Playback | `Audio.backends` | — | No |
+| OCP Plugins | — | — | No |
+| Dialog Transformers | — | — | No |
+| TTS Transformers | — | — | No |
+| PHAL | — | — | No (auto-loaded if installed) |
 
-| Plugin Type | Description | Required | Link |
-|-------------|-------------|----------|------|
-| Microphone | Captures voice input | Yes | [Microphone](https://openvoiceos.github.io/ovos-technical-manual//310-mic_plugins/#microphone-plugins) |
-| VAD | Voice Activity Detection | Yes | [VAD](https://openvoiceos.github.io/ovos-technical-manual//311-vad_plugins/#list-of-vad-plugins) |
-| WakeWord | Detects wake words for interaction | Yes | [WakeWord](https://openvoiceos.github.io/ovos-technical-manual//312-wake_word_plugins/#list-of-wake-word-plugins) |
-| G2P | grapheme-to-phoneme (G2P), used to simulate mouth movements  | No | [G2P](https://openvoiceos.github.io/ovos-technical-manual//321-g2p_plugins/) |
-| Media Playback Plugins | Enables media playback (e.g., "play Metallica") | No | [Media Playback Plugins](https://openvoiceos.github.io/ovos-technical-manual/371-media_plugins/) |
-| OCP Plugins | Provides playback support for URLs (e.g., YouTube) | No | [OCP Plugins](https://openvoiceos.github.io/ovos-technical-manual/370-ocp_plugins/) |
-| Dialog Transformers | Processes text before text-to-speech (TTS) | No | [Dialog Transformers](https://openvoiceos.github.io/ovos-technical-manual/330-transformer_plugins/) |
-| TTS Transformers | Processes audio after text-to-speech (TTS) | No | [TTS Transformers](https://openvoiceos.github.io/ovos-technical-manual/103-audio_service/#transformer-plugins) |
-| PHAL | Provides platform-specific support (e.g., Mark 1) | No | [PHAL](https://openvoiceos.github.io/ovos-technical-manual/340-PHAL/#plugins)
+See [docs/configuration.md](docs/configuration.md) for full details and plugin swap instructions.
+
+---
+
+## Features and limitations
+
+Built on [ovos-simple-listener](https://github.com/TigreGotico/ovos-simple-listener). Compared to the full voice-satellite:
+
+**Present:**
+- Microphone capture, VAD, wakeword detection — all local
+- Audio forwarded to HiveMind-listener for STT (base64-encoded WAV over the HiveMessage bus)
+- TTS audio synthesised server-side and streamed back for local playback
+- PHAL (platform hardware abstraction) auto-loaded if installed
+- Standard OVOS plugin system for mic, VAD, and wakeword
+
+**Not supported** (use [HiveMind-voice-sat](https://github.com/JarbasHiveMind/HiveMind-voice-sat) if you need these):
+- Local STT / TTS plugins
+- Audio Transformers
+- Continuous / Hybrid / Recording / Sleep listening modes
+- Multiple wake words
+
+---
+
+## Related
+
+| Project | Role |
+|---|---|
+| [HiveMind-listener](https://github.com/JarbasHiveMind/HiveMind-listener) | Required server — provides STT + TTS |
+| [hivemind-core](https://github.com/JarbasHiveMind/HiveMind-core) | Base mesh node (no STT/TTS) |
+| [HiveMind-cli](https://github.com/JarbasHiveMind/HiveMind-cli) | Text-only satellite |
+| [hivemind-mic-satellite](https://github.com/JarbasHiveMind/hivemind-mic-satellite) | Thinnest audio satellite (no local wakeword) |
+| [HiveMind-voice-sat](https://github.com/JarbasHiveMind/HiveMind-voice-sat) | Full local stack satellite |
+| [hivemind-bus-client](https://github.com/JarbasHiveMind/hivemind-bus-client) | HiveMind WebSocket client library |
+| [ovos-simple-listener](https://github.com/TigreGotico/ovos-simple-listener) | Lightweight listener library used internally |
+
+---
+
+## License
+
+[Apache-2.0](LICENSE)
