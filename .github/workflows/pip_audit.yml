@@ -1,4 +1,4 @@
-name: License Check
+name: PIP Audit
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  license_check:
-    uses: OpenVoiceOS/gh-automations/.github/workflows/license-check.yml@dev
+  pip_audit:
+    uses: OpenVoiceOS/gh-automations/.github/workflows/pip-audit.yml@dev
     with:
       system_deps: 'libasound2-dev'
