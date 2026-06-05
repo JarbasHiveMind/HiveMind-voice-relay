@@ -50,7 +50,7 @@ setup(
         "test": [
             "pytest",
             "pytest-timeout",
-            "hivescope==0.2.2a1",
+            "hivescope==0.3.0a1",
         ],
     },
     include_package_data=True,
