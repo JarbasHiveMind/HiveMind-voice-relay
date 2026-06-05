@@ -1,20 +1,28 @@
 # Changelog
 
+## [1.1.0a2](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.1.0a2) (2026-06-05)
+
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.1.0a1...1.1.0a2)
+
+**Merged pull requests:**
+
+- docs: reframe voice-relay around HiveMind-as-a-service [\#23](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/23) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [1.1.0a1](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.1.0a1) (2026-06-05)
 
-[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.0.4a2...1.1.0a1)
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.0.4a1...1.1.0a1)
 
 **Merged pull requests:**
 
 - feat: modernize deps, CI to gh-automations@dev, ACL e2e tests [\#20](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/20) ([JarbasAl](https://github.com/JarbasAl))
 
-## [1.0.4a2](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.0.4a2) (2026-02-03)
-
-[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.0.4a1...1.0.4a2)
-
 ## [1.0.4a1](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.0.4a1) (2026-02-03)
 
-[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.0.3...1.0.4a1)
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.0.4a2...1.0.4a1)
+
+## [1.0.4a2](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.0.4a2) (2026-02-03)
+
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.0.3...1.0.4a2)
 
 **Merged pull requests:**
 
