@@ -9,11 +9,11 @@
 
 ### Server
 
-> ⚠️ **You must have [HiveMind-listener](https://github.com/JarbasHiveMind/HiveMind-listener) running as the server.** Plain `hivemind-core` does not provide STT or TTS — if you connect to it, wakeword will trigger but nothing will be transcribed and no spoken response will be returned.
+> ⚠️ **Your `hivemind-core` server must have the [hivemind-audio-binary-protocol](https://github.com/JarbasHiveMind/hivemind-audio-binary-protocol) binary plugin installed.** Plain `hivemind-core` does not provide STT or TTS — if you connect to it, wakeword will trigger but nothing will be transcribed and no spoken response will be returned.
 
-Set up HiveMind-listener on a machine that has the resources to run STT and TTS models. Follow its own documentation to:
+Install the `hivemind-audio-binary-protocol` plugin on a `hivemind-core` server that has the resources to run STT and TTS models. Then:
 
-1. Install and start `hivemind-listener`.
+1. Install `hivemind-audio-binary-protocol` and (re)start `hivemind-core`.
 2. Create a client credential (access key + password) using `hivemind-client add-client`.
 3. Note the host address and port (default `5678`).
 
@@ -94,7 +94,7 @@ hivemind-voice-relay --selfsigned
 4. Speak a command (e.g. "what time is it").
 5. The log prints the transcription (`STT: what time is it`) and the server sends back TTS audio that plays on the device.
 
-If you see the wakeword trigger but no transcription arrives, check that the server is `hivemind-listener` and not plain `hivemind-core`. See [Troubleshooting](troubleshooting.md).
+If you see the wakeword trigger but no transcription arrives, check that `hivemind-core` has the `hivemind-audio-binary-protocol` plugin installed. See [Troubleshooting](troubleshooting.md).
 
 ---
 

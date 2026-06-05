@@ -2,7 +2,7 @@
 
 ## Wakeword triggers but nothing happens (no transcription, no spoken response)
 
-**Most likely cause:** the satellite is connected to `hivemind-core` instead of `HiveMind-listener`.
+**Most likely cause:** the `hivemind-core` server is missing the `hivemind-audio-binary-protocol` plugin.
 
 `hivemind-core` does not handle the `recognizer_loop:b64_transcribe` or `speak:b64_audio` messages. The relay sends audio to the server and waits up to 20 seconds for a transcription response; when none arrives it logs:
 
@@ -12,7 +12,7 @@ Timeout waiting for STT transcriptions
 
 and returns an empty string. No intent fires and no TTS audio is sent back.
 
-**Fix:** ensure the server is running `HiveMind-listener`, not `hivemind-core`.
+**Fix:** ensure `hivemind-core` has the `hivemind-audio-binary-protocol` plugin installed.
 Alternatively, run `hivemind-core` together with `ovos-audio` and `ovos-dinkum-listener` on the same machine to provide the same capabilities.
 
 ---

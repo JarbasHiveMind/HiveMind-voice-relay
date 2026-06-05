@@ -5,7 +5,7 @@
 HiveMind Voice Relay splits the voice pipeline across two machines:
 
 ```
-Device (relay)                          Server (HiveMind-listener)
+Device (relay)                          Server (hivemind-core + audio-binary-protocol)
 ──────────────────────────────          ─────────────────────────────────────
 Microphone → VAD → Wakeword             STT model → Intent / Skills → TTS model
                        │                     ↑                           │
@@ -62,7 +62,7 @@ After recording ends, `recognizer_loop:record_end` is emitted, then the audio is
 
 On timeout or empty response, it returns an empty string and logs the error.
 
-The server (HiveMind-listener) receives the `b64_transcribe` message, runs its configured STT plugin, and sends back the response.
+hivemind-core — via the `hivemind-audio-binary-protocol` plugin — receives the `b64_transcribe` message, runs its configured STT plugin, and sends back the response.
 
 ---
 
@@ -101,9 +101,9 @@ Messages flow as `HiveMessage` packets over the WebSocket. OVOS-style `Message` 
 
 ---
 
-## HiveMind-listener vs hivemind-core
+## Server-side audio: the `hivemind-audio-binary-protocol` plugin
 
-| | hivemind-core | HiveMind-listener |
+| | hivemind-core | core + audio-binary-protocol |
 |---|---|---|
 | Intent routing | Yes | Yes |
 | Skills | Yes | Yes |
@@ -111,7 +111,7 @@ Messages flow as `HiveMessage` packets over the WebSocket. OVOS-style `Message` 
 | TTS (speak:b64_audio) | **No** | **Yes** |
 | Required by voice-relay | **No** | **Yes** |
 
-`hivemind-core` is a base mesh node. It routes HiveMessages between satellites and an OVOS instance but does not itself process audio. `HiveMind-listener` extends it with a listener service that handles the `b64_transcribe` and `speak:b64_audio` protocol messages that voice-relay depends on.
+`hivemind-core` is a base mesh node. It routes HiveMessages between satellites and an OVOS instance but does not itself process audio. The [`hivemind-audio-binary-protocol`](https://github.com/JarbasHiveMind/hivemind-audio-binary-protocol) binary plugin adds the listener service that handles the `b64_transcribe` and `speak:b64_audio` protocol messages that voice-relay depends on.
 
 Connecting voice-relay to a plain `hivemind-core` node will result in wakeword triggering, audio being sent, and silence — the STT request will time out and no TTS will arrive.
 
@@ -142,7 +142,7 @@ PHAL plugins handle platform-specific hardware (LEDs, buttons, display on device
 | Wakeword latency | Server RTT | **Local** | Local |
 | STT model on device | No | **No** | Yes |
 | TTS model on device | No | **No** | Yes |
-| Requires HiveMind-listener | Yes | **Yes** | No (core) |
+| Requires `hivemind-audio-binary-protocol` plugin | Yes | **Yes** | No |
 | Device resource requirement | Minimal | Low | High |
 
-Voice relay is the best fit when: the device is resource-constrained (no STT/TTS), privacy or latency of wakeword detection matters, and a HiveMind-listener server is available.
+Voice relay is the best fit when: the device is resource-constrained (no STT/TTS), privacy or latency of wakeword detection matters, and a `hivemind-core` server with the `hivemind-audio-binary-protocol` plugin is available.

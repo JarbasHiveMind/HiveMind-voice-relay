@@ -4,9 +4,9 @@
 [![PyPI](https://img.shields.io/pypi/v/HiveMind-voice-relay)](https://pypi.org/project/HiveMind-voice-relay/)
 [![Python](https://img.shields.io/pypi/pyversions/HiveMind-voice-relay)](https://pypi.org/project/HiveMind-voice-relay/)
 
-**Local wakeword detection; STT and TTS handled remotely by HiveMind-listener.**
+**Local wakeword detection; STT and TTS handled remotely by hivemind-core running the hivemind-audio-binary-protocol plugin.**
 
-Voice Relay runs the microphone, VAD, and wakeword engine on-device — keeping wake-word detection private and low-latency — while forwarding audio to a **HiveMind-listener** server for speech-to-text, and receiving synthesised audio back for playback. No STT or TTS models run on the device.
+Voice Relay runs the microphone, VAD, and wakeword engine on-device — keeping wake-word detection private and low-latency — while forwarding audio to **hivemind-core** (running the **hivemind-audio-binary-protocol** plugin) for speech-to-text, and receiving synthesised audio back for playback. No STT or TTS models run on the device.
 
 > Full documentation: **[docs/](docs/index.md)**
 
@@ -17,8 +17,8 @@ Voice Relay runs the microphone, VAD, and wakeword engine on-device — keeping 
 | Satellite | Mic | VAD | Wake word | STT | TTS | Connects to |
 |---|---|---|---|---|---|---|
 | [HiveMind-cli](https://github.com/JarbasHiveMind/HiveMind-cli) | — | — | — | — | — | hivemind-core |
-| [hivemind-mic-satellite](https://github.com/JarbasHiveMind/hivemind-mic-satellite) | local | local | **server** | server | server | HiveMind-listener |
-| **HiveMind-voice-relay** (this repo) | local | local | **local** | server | server | **HiveMind-listener** |
+| [hivemind-mic-satellite](https://github.com/JarbasHiveMind/hivemind-mic-satellite) | local | local | **server** | server | server | core + audio-binary-protocol |
+| **HiveMind-voice-relay** (this repo) | local | local | **local** | server | server | **core + audio-binary-protocol** |
 | [HiveMind-voice-sat](https://github.com/JarbasHiveMind/HiveMind-voice-sat) | local | local | local | local | local | hivemind-core |
 
 Voice Relay is the middle-ground: wakeword detection stays on-device (low latency, no audio leaves until activation), while the heavier STT and TTS models run on the server.
@@ -27,7 +27,7 @@ Voice Relay is the middle-ground: wakeword detection stays on-device (low latenc
 
 ## Server requirements
 
-> ⚠️ **This satellite requires [HiveMind-listener](https://github.com/JarbasHiveMind/HiveMind-listener) on the server.** Plain `hivemind-core` does not handle STT or TTS — connecting to it will result in silence (no transcription, no spoken response).
+> ⚠️ **Your `hivemind-core` server must have the [hivemind-audio-binary-protocol](https://github.com/JarbasHiveMind/hivemind-audio-binary-protocol) binary plugin installed.** Plain `hivemind-core` does not handle STT or TTS — connecting to it will result in silence (no transcription, no spoken response).
 >
 > Alternatively, run `hivemind-core` together with `ovos-audio` and `ovos-dinkum-listener` to provide the same capabilities.
 
@@ -64,7 +64,7 @@ hivemind-voice-relay
 ```
 Usage: hivemind-voice-relay [OPTIONS]
 
-  connect to HiveMind Sound Server
+  connect to hivemind-core running the audio binary protocol
 
 Options:
   --host TEXT      hivemind host (ws:// or wss://)
@@ -106,7 +106,7 @@ Built on [ovos-simple-listener](https://github.com/TigreGotico/ovos-simple-liste
 
 **Present:**
 - Microphone capture, VAD, wakeword detection — all local
-- Audio forwarded to HiveMind-listener for STT (base64-encoded WAV over the HiveMessage bus)
+- Audio forwarded to hivemind-core (hivemind-audio-binary-protocol plugin) for STT (base64-encoded WAV over the HiveMessage bus)
 - TTS audio synthesised server-side and streamed back for local playback
 - PHAL (platform hardware abstraction) auto-loaded if installed
 - Standard OVOS plugin system for mic, VAD, and wakeword
@@ -123,7 +123,7 @@ Built on [ovos-simple-listener](https://github.com/TigreGotico/ovos-simple-liste
 
 | Project | Role |
 |---|---|
-| [HiveMind-listener](https://github.com/JarbasHiveMind/HiveMind-listener) | Required server — provides STT + TTS |
+| [hivemind-audio-binary-protocol](https://github.com/JarbasHiveMind/hivemind-audio-binary-protocol) | Required `hivemind-core` plugin — provides server-side STT + TTS |
 | [hivemind-core](https://github.com/JarbasHiveMind/HiveMind-core) | Base mesh node (no STT/TTS) |
 | [HiveMind-cli](https://github.com/JarbasHiveMind/HiveMind-cli) | Text-only satellite |
 | [hivemind-mic-satellite](https://github.com/JarbasHiveMind/hivemind-mic-satellite) | Thinnest audio satellite (no local wakeword) |

@@ -6,10 +6,10 @@ All flags are optional when a node identity is stored via `hivemind-client set-i
 
 | Flag | Type | Default | Description |
 |---|---|---|---|
-| `--host` | string | identity file | WebSocket URL or hostname of the HiveMind-listener server. A `ws://` scheme is prepended if no scheme is given. |
+| `--host` | string | identity file | WebSocket URL or hostname of the `hivemind-core` server (running the `hivemind-audio-binary-protocol` plugin). A `ws://` scheme is prepended if no scheme is given. |
 | `--key` | string | identity file | Access key issued by the server. |
 | `--password` | string | identity file | Password used for key derivation. |
-| `--port` | integer | identity file or `5678` | TCP port of the HiveMind-listener server. |
+| `--port` | integer | identity file or `5678` | TCP port of the `hivemind-core` server. |
 | `--selfsigned` | flag | false | Accept self-signed TLS certificates. Required when the server uses a certificate not trusted by your system. |
 | `--siteid` | string | identity file or `"unknown"` | Location identifier added to message context. Useful when running multiple satellites. |
 
@@ -137,4 +137,4 @@ Full list: [OVOS VAD Plugins](https://openvoiceos.github.io/ovos-technical-manua
 
 ## What is NOT configurable here
 
-STT and TTS plugins are **not configured on the relay device** — they run on the HiveMind-listener server. Configure them in the server's OVOS config.
+STT and TTS plugins are **not configured on the relay device** — they run on the `hivemind-core` server (via the `hivemind-audio-binary-protocol` plugin). Configure them in the server's OVOS config.
