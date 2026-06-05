@@ -117,6 +117,16 @@ Connecting voice-relay to a plain `hivemind-core` node will result in wakeword t
 
 ---
 
+## HiveMind as a service: ownership and authentication
+
+This is the part that matters most from a developer's perspective — beyond moving compute off the device, voice-relay shows HiveMind operating speech as an owned, governed service.
+
+**The hive owns STT/TTS; the satellite cannot choose them.** The relay never names an STT or TTS engine. It emits `recognizer_loop:b64_transcribe` and `speak:b64_audio` and takes whatever the hive returns. Which STT/TTS plugin, which model, which voice — all of that is configured once on `hivemind-core` (in the `hivemind-audio-binary-protocol` plugin's OVOS config) and applied uniformly to every relay that connects. Contrast a [voice-sat](https://github.com/JarbasHiveMind/HiveMind-voice-sat), which runs its own STT/TTS plugins and can point at any endpoint it likes — including a public `ovos-stt-plugin-server` / `ovos-tts-plugin-server`. The relay deliberately gives that control up to the operator.
+
+**Speech is behind auth.** Because STT/TTS live inside the hive, they inherit the protocol's access-key authentication. They are not an open network service anyone can call — a client must be a credentialed member of the mesh to transcribe or synthesise. A public OVOS plugin server has no such gate; HiveMind makes speech a first-class, authenticated capability of the hive itself.
+
+**b64 vs binary — the same job, two transports.** The relay carries audio as base64-encoded WAV over the JSON bus (`b64_transcribe` / `b64_audio`). [mic-satellite](https://github.com/JarbasHiveMind/hivemind-mic-satellite) does the equivalent over the binary protocol (`HiveMessageType.BINARY` / `RAW_AUDIO`), which avoids the ~33% base64 overhead. Relay is the reference implementation for the b64 path; it could be built on the binary protocol instead. Choose b64 for simplicity and debuggability, binary for bandwidth.
+
 ## PHAL (optional)
 
 If `ovos-PHAL` is installed, the relay loads it using the HiveMind bus as its internal bus:
