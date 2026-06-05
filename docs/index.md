@@ -8,7 +8,7 @@
 
 HiveMind Voice Relay is a satellite client for the HiveMind mesh. It runs the microphone, voice-activity detection (VAD), and wakeword engine on-device, but forwards audio to **hivemind-core** running the **hivemind-audio-binary-protocol** plugin for speech-to-text (STT). The server synthesises speech (TTS) and sends audio back for local playback.
 
-This makes it the middle-ground option: wakeword privacy and low activation latency without the resource cost of running STT/TTS models locally.
+The point is architectural, not just resource savings: **the hive owns STT/TTS**. They run inside `hivemind-core` (via the `hivemind-audio-binary-protocol` plugin), **behind the same access-key authentication** as the rest of the mesh — so a relay does not, and cannot, choose its own STT/TTS engine, model, or voice. The hive operator decides, centrally, for every relay. (Contrast a [voice-sat](https://github.com/JarbasHiveMind/HiveMind-voice-sat), which can point at any plugin, including a public `ovos-stt-plugin-server`.) Relay also demonstrates the **base64 speech API** (`recognizer_loop:b64_transcribe` / `speak:b64_audio`) — the same job [mic-satellite](https://github.com/JarbasHiveMind/hivemind-mic-satellite) does over the binary protocol.
 
 ---
 
@@ -22,8 +22,9 @@ This makes it the middle-ground option: wakeword privacy and low activation late
 | [HiveMind-voice-sat](https://github.com/JarbasHiveMind/HiveMind-voice-sat) | local | local | local | local | local | hivemind-core |
 
 **Choose voice-relay when:**
-- You want wakeword detection to happen on-device (latency, privacy — audio is not streamed until activation).
-- You do not want to run STT or TTS models on the device (CPU/memory constraints).
+- You want HiveMind to **own and govern STT/TTS as an authenticated service** — uniform engine/model/voice across all relays, decided by the hive operator, not the device.
+- You want wakeword detection on-device (latency, privacy — audio is not streamed until activation).
+- You do not want to run STT or TTS models on the device (a welcome consequence, not the main reason).
 - Your `hivemind-core` server has the `hivemind-audio-binary-protocol` plugin installed.
 
 ---

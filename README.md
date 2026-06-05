@@ -21,7 +21,19 @@ Voice Relay runs the microphone, VAD, and wakeword engine on-device — keeping 
 | **HiveMind-voice-relay** (this repo) | local | local | **local** | server | server | **core + audio-binary-protocol** |
 | [HiveMind-voice-sat](https://github.com/JarbasHiveMind/HiveMind-voice-sat) | local | local | local | local | local | hivemind-core |
 
-Voice Relay is the middle-ground: wakeword detection stays on-device (low latency, no audio leaves until activation), while the heavier STT and TTS models run on the server.
+Voice Relay keeps wakeword detection on-device (low latency, no audio leaves until activation) while STT and TTS run on the hive. The point is not mainly resource savings — it is **what it means for the hive to own speech services** (see below).
+
+---
+
+## Why voice-relay — HiveMind as a service
+
+Voice-relay's real lesson is architectural. STT and TTS run *inside the hive* (the `hivemind-audio-binary-protocol` plugin on `hivemind-core`) and sit **behind the same access-key authentication** as the rest of the mesh. For a developer, the consequences matter more than the saved CPU:
+
+- **The hive owns STT/TTS.** A [voice-sat](https://github.com/JarbasHiveMind/HiveMind-voice-sat) can point at any STT/TTS plugin it likes — including a public `ovos-stt-plugin-server` / `ovos-tts-plugin-server`. A relay **cannot**: it does not choose the engine, model, or voice. The **hive operator decides**, centrally and uniformly, for every relay that connects.
+- **Speech is authenticated.** STT/TTS are not an open endpoint anyone can hit — access is gated by the client's HiveMind credentials, exactly like every other message on the protocol.
+- **It is the reference for the b64 speech API.** The relay sends audio for STT and receives speech for TTS as base64-encoded WAV over the HiveMessage bus (`recognizer_loop:b64_transcribe`, `speak:b64_audio`) — the same work [mic-satellite](https://github.com/JarbasHiveMind/hivemind-mic-satellite) does over the binary protocol. Relay illustrates the b64 path; it could equally use binary.
+
+Choose voice-relay when you want HiveMind to operate STT/TTS as a **governed, authenticated service** — uniform and centrally controlled — with wakeword kept local for latency and privacy. Lower device resource use is a consequence, not the goal.
 
 ---
 
