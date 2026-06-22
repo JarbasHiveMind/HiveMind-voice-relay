@@ -13,6 +13,6 @@ jobs:
       coverage_source: 'hivemind_voice_relay'
       test_path: 'tests/'
       system_deps: 'libasound2-dev'
-      # policy-stack pin: switch hivemind-core to released once #89 merges to dev
-      pre_install_pip: '"hivescope==0.3.0a1" "hivemind-plugin-manager==0.6.0a1" "hivemind-ovos-agent-plugin==0.2.0a1" "hivemind-core==4.3.0a2"'
+      # version policy is in pyproject (the `test` extra); no pre_install pins here.
+      test_extras: 'test'
       min_coverage: 0
