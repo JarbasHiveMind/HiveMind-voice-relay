@@ -12,7 +12,20 @@ requires-python = ">=3.10"
 dynamic = ["version", "dependencies"]
 
 [project.optional-dependencies]
-test = ["pytest", "pytest-timeout", "hivescope==0.3.0a3"]
+# Test/e2e deps. Pinned to the bus-client 1.x world: the relay's ovos-audio /
+# ovos-simple-listener runtime deps require ovos-bus-client<2.0.0, so core and
+# the agent plugin stay on their last 1.x-compatible alphas (the 2.x successors
+# require ovos-bus-client>=2.0.0a3 and would conflict). hivescope 0.5.0a2
+# resolves on 1.x via hivemind-bus-client 0.9.1a1. Bump once ovos-audio /
+# ovos-simple-listener support ovos-bus-client 2.x.
+test = [
+    "pytest",
+    "pytest-timeout",
+    "hivescope==0.5.0a2",
+    "hivemind-core==4.3.0a2",
+    "hivemind-ovos-agent-plugin==0.2.0a1",
+    "hivemind-plugin-manager==0.6.0a1",
+]
 
 [project.urls]
 Homepage = "https://github.com/JarbasHiveMind/HiveMind-voice-relay"
