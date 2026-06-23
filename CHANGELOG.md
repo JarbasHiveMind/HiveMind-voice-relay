@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.0a4](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.1.0a4) (2026-06-23)
+
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.1.0a3...1.1.0a4)
+
+**Merged pull requests:**
+
+- test\(e2e\): refresh hivescope pin 0.3.0a1→0.5.0a2; move policy pins into pyproject [\#26](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/26) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [1.1.0a3](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.1.0a3) (2026-06-05)
 
 [Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.1.0a2...1.1.0a3)
