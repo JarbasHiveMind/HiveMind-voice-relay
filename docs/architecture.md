@@ -127,6 +127,25 @@ This is the part that matters most from a developer's perspective — beyond mov
 
 **b64 vs binary — the same job, two transports.** The relay carries audio as base64-encoded WAV over the JSON bus (`b64_transcribe` / `b64_audio`). [mic-satellite](https://github.com/JarbasHiveMind/hivemind-mic-satellite) does the equivalent over the binary protocol (`HiveMessageType.BINARY` / `RAW_AUDIO`), which avoids the ~33% base64 overhead. Relay is the reference implementation for the b64 path; it could be built on the binary protocol instead. Choose b64 for simplicity and debuggability, binary for bandwidth.
 
+## Dependencies
+
+The relay runs on the OVOS **bus-client 2.x** stack. Runtime dependencies are
+declared in `pyproject.toml` (the single packaging source of truth — there is no
+`requirements.txt` or `setup.py`):
+
+| Dependency | Floor | Role |
+|---|---|---|
+| `hivemind-bus-client` | `>=0.9.2a1` | HiveMessage transport + node identity (2.x line) |
+| `ovos-bus-client` | `>=2.0.0a3` | OVOS `Message` envelope + session (2.x) |
+| `ovos-audio` | `>=1.3.0a1` | `PlaybackService` for local TTS playback |
+| `ovos-simple-listener` | `>=0.3.1a1` | local mic → VAD → wakeword loop |
+| `ovos-plugin-manager` | `>=2.4.1a1` | plugin factories (mic/VAD/wakeword/STT/TTS) |
+
+The bus-client 2.x floors are expressed as **prerelease floor pins** (`>=X.Ya1`),
+so `pip`/`uv` resolve the alpha line without any `--pre` flag. `ovos-audio`
+`1.3.0a1` and `ovos-simple-listener` `0.3.1a1` allow `ovos-bus-client<3.0.0`, so
+the relay carries no bus-client `<2.0.0` cap.
+
 ## PHAL (optional)
 
 If `ovos-PHAL` is installed, the relay loads it using the HiveMind bus as its internal bus:

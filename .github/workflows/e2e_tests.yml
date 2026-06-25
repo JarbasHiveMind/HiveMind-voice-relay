@@ -1,0 +1,21 @@
+name: E2E Tests
+
+# End-to-end suite (tests/e2e/): a real hivemind-core master in-process + the
+# real relay client over a real HiveMessageBusClient via the hivescope harness.
+# Wakeword/mic/VAD/audio capture and the remote STT/TTS endpoints are mocked —
+# no real devices or network. Installs the `e2e` extra (hivescope>=0.5.2a1 +
+# the 2.x hivemind stack); all version policy lives in pyproject.
+
+on:
+  pull_request:
+    branches: [dev, master]
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    uses: OpenVoiceOS/gh-automations/.github/workflows/build-tests.yml@dev
+    with:
+      python_versions: '["3.10", "3.11", "3.12", "3.13"]'
+      system_deps: 'libasound2-dev'
+      install_extras: 'e2e'
+      test_path: 'tests/e2e/'
