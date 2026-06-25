@@ -145,6 +145,22 @@ Built on [ovos-simple-listener](https://github.com/TigreGotico/ovos-simple-liste
 
 ---
 
+## Development
+
+Install from source with the end-to-end test extra, then run the suite:
+
+```bash
+uv pip install -e ".[e2e]"
+pytest tests/
+```
+
+`pyproject.toml` is the single packaging source of truth. The E2E suite runs a
+real `hivemind-core` master in-process and the real relay client over a real
+`HiveMessageBusClient`, with the microphone/wakeword and the remote STT/TTS
+endpoints mocked — see **[docs/development.md](docs/development.md)**.
+
+---
+
 ## License
 
 [Apache-2.0](LICENSE)

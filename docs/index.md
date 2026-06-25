@@ -37,6 +37,7 @@ The point is architectural, not just resource savings: **the hive owns STT/TTS**
 | [Configuration](configuration.md) | Plugin setup, all CLI flags |
 | [Architecture](architecture.md) | How the relay pipeline works internally |
 | [Deployment](deployment.md) | systemd, Raspberry Pi, autostart |
+| [Development & tests](development.md) | Install from source, run + understand the E2E suite |
 | [Troubleshooting](troubleshooting.md) | Common problems and fixes |
 
 ---

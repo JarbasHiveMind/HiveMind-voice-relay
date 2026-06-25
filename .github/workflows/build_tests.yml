@@ -11,6 +11,9 @@ jobs:
     with:
       python_versions: '["3.10", "3.11", "3.12", "3.13"]'
       system_deps: 'libasound2-dev'
-      # version policy is in pyproject (the `test` extra); no pre_install pins here.
+      # version policy is in pyproject (the `test` extra aliases `e2e`); no
+      # pre_install pins here. The dedicated E2E workflow runs tests/e2e/ with
+      # the `e2e` extra; this build job exercises the whole tests/ tree and the
+      # clean install across all supported Python versions.
       install_extras: 'test'
       test_path: 'tests/'
