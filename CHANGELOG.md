@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.0a1](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.2.0a1) (2026-06-25)
+
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.1.0a4...1.2.0a1)
+
+**Merged pull requests:**
+
+- feat: modernize relay onto the ovos-bus-client 2.x stack \(deps, CI, docs, real-client E2E\) [\#29](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/29) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [1.1.0a4](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.1.0a4) (2026-06-23)
 
 [Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.1.0a3...1.1.0a4)
