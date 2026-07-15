@@ -117,6 +117,39 @@ Full list: [OVOS VAD Plugins](https://openvoiceos.github.io/ovos-technical-manua
 | TTS Transformers | n/a | Audio post-processing after TTS audio received |
 | PHAL | n/a | Platform hardware abstraction, auto-loaded if `ovos-PHAL` is installed |
 
+### Transformer pipelines
+
+The relay runs OVOS transformer plugins on-device, opt-in via this device's
+`mycroft.conf`:
+
+- **`audio_transformers`** — applied to captured speech before it is sent to
+  the server for STT (e.g. denoise for a bad microphone).
+- **`utterance_transformers`** — applied to the transcript before
+  `recognizer_loop:utterance` is emitted; a plugin cancellation
+  (OVOS-TRANSFORM §8.1, e.g. `ovos-utterance-plugin-cancel`) drops the
+  utterance on-device.
+- **`tts_transformers`** — applied to received TTS audio before playback
+  (e.g. a per-device pitch or speed effect).
+
+```json
+{
+  "utterance_transformers": {
+    "ovos-utterance-plugin-cancel": {}
+  },
+  "tts_transformers": {
+    "ovos-tts-transformer-sox-plugin": {"pitch": 300}
+  }
+}
+```
+
+Use device-side transformers for **per-device** effects; fleet-wide effects
+belong on the server (hivemind-audio-binary-protocol / hivemind-core / a
+shared tts-server). Remember the server may already rewrite things: TTS
+audio saying **different text than the skill produced** usually means a
+dialog transformer is centralizing a tone/persona server-side. Never enable
+the same plugin on both sides, or the effect is applied twice. Full
+contract: [ovos-plugin-manager transformer docs](https://github.com/OpenVoiceOS/ovos-plugin-manager/blob/dev/docs/transformers.md).
+
 ### Example mycroft.conf
 
 ```json
