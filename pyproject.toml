@@ -21,7 +21,7 @@ dependencies = [
     # ovos-bus-client<2.0.0 cap (now <3.0.0), unblocking the 2.x move.
     "ovos-audio>=1.3.0a1",
     # opm.* entry-point groups need >=2.1.0; the 2.x agents want the 2.4 alphas.
-    "ovos-plugin-manager>=2.4.1a1",
+    "ovos-plugin-manager>=2.10.0a1",
     # Local mic/VAD/wakeword loop. 0.3.1a1 also allows ovos-bus-client<3.0.0.
     "ovos-simple-listener>=0.3.1a1",
     "ovos-microphone-plugin-alsa",
