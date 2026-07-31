@@ -161,3 +161,6 @@ pip install ovos-PHAL
 ```
 
 Otherwise the message can be ignored.
+
+---
+[← Development](development.md) · [Home](index.md)

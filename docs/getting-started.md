@@ -9,7 +9,7 @@
 
 ### Server
 
-> ⚠️ **Your `hivemind-core` server must have the [hivemind-audio-binary-protocol](https://github.com/JarbasHiveMind/hivemind-audio-binary-protocol) binary plugin installed.** Plain `hivemind-core` does not provide STT or TTS — if you connect to it, wakeword will trigger but nothing will be transcribed and no spoken response will be returned.
+> **Your `hivemind-core` server must have the [hivemind-audio-binary-protocol](https://github.com/JarbasHiveMind/hivemind-audio-binary-protocol) binary plugin installed.** Plain `hivemind-core` does not provide STT or TTS. If you connect to it, wakeword triggers, but nothing is transcribed and no spoken response returns.
 
 Install the `hivemind-audio-binary-protocol` plugin on a `hivemind-core` server that has the resources to run STT and TTS models. Then:
 
@@ -30,9 +30,9 @@ pip install HiveMind-voice-relay
 ```
 
 This installs the `hivemind-voice-relay` CLI entry point and pulls in default plugins:
-- `ovos-microphone-plugin-alsa` — ALSA microphone capture
-- `ovos-vad-plugin-silero` — Silero VAD
-- `ovos-stt-plugin-server` / `ovos-tts-plugin-server` — used internally for the relay transport
+- `ovos-microphone-plugin-alsa`: ALSA microphone capture
+- `ovos-vad-plugin-silero`: Silero VAD
+- `ovos-stt-plugin-server` / `ovos-tts-plugin-server`: used internally for the relay transport
 
 ---
 
@@ -103,3 +103,6 @@ If you see the wakeword trigger but no transcription arrives, check that `hivemi
 - Swap the wake word or microphone plugin: [Configuration](configuration.md)
 - Run as a system service: [Deployment](deployment.md)
 - Understand the internal pipeline: [Architecture](architecture.md)
+
+---
+[Home](index.md) · [Configuration →](configuration.md)

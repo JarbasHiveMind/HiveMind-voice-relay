@@ -43,9 +43,9 @@ The wake word name is read from `Configuration().get("listener", {}).get("wake_w
 ### What happens on wakeword detection
 
 `HMCallbacks.listen_callback()` fires internal bus events:
-- `mycroft.audio.play_sound` — plays the start-listening chime locally.
-- `recognizer_loop:wakeword` — notifies local PHAL/audio subsystems.
-- `recognizer_loop:record_begin` — marks the start of recording.
+- `mycroft.audio.play_sound`: plays the start-listening chime locally.
+- `recognizer_loop:wakeword`: notifies local PHAL/audio subsystems.
+- `recognizer_loop:record_begin`: marks the start of recording.
 
 After recording ends, `recognizer_loop:record_end` is emitted, then the audio is passed to `HiveMindSTT`.
 
@@ -62,7 +62,7 @@ After recording ends, `recognizer_loop:record_end` is emitted, then the audio is
 
 On timeout or empty response, it returns an empty string and logs the error.
 
-hivemind-core — via the `hivemind-audio-binary-protocol` plugin — receives the `b64_transcribe` message, runs its configured STT plugin, and sends back the response.
+hivemind-core, via the `hivemind-audio-binary-protocol` plugin, receives the `b64_transcribe` message. It runs its configured STT plugin and sends back the response.
 
 ---
 
@@ -75,7 +75,7 @@ hivemind-core — via the `hivemind-audio-binary-protocol` plugin — receives t
 3. The server synthesises audio and sends back `speak:b64_audio.response` with `{"audio": "<b64>", "utterance": "...", "listen": bool}`.
 4. The relay decodes the base64 data, writes it to a temp WAV file, and puts the file path on the `TTS.queue` for playback by the local audio service.
 
-This means audio is synthesised on the server with full TTS plugin support; the device only needs a speaker.
+This means audio is synthesised on the server with full TTS plugin support. The device only needs a speaker.
 
 ---
 
@@ -113,24 +113,24 @@ Messages flow as `HiveMessage` packets over the WebSocket. OVOS-style `Message` 
 
 `hivemind-core` is a base mesh node. It routes HiveMessages between satellites and an OVOS instance but does not itself process audio. The [`hivemind-audio-binary-protocol`](https://github.com/JarbasHiveMind/hivemind-audio-binary-protocol) binary plugin adds the listener service that handles the `b64_transcribe` and `speak:b64_audio` protocol messages that voice-relay depends on.
 
-Connecting voice-relay to a plain `hivemind-core` node will result in wakeword triggering, audio being sent, and silence — the STT request will time out and no TTS will arrive.
+Connecting voice-relay to a plain `hivemind-core` node triggers the wakeword and sends audio, but the STT request times out and no TTS arrives.
 
 ---
 
 ## HiveMind as a service: ownership and authentication
 
-This is the part that matters most from a developer's perspective — beyond moving compute off the device, voice-relay shows HiveMind operating speech as an owned, governed service.
+This is the part that matters most from a developer's perspective. Beyond moving compute off the device, voice-relay shows HiveMind operating speech as an owned, governed service.
 
-**The hive owns STT/TTS; the satellite cannot choose them.** The relay never names an STT or TTS engine. It emits `recognizer_loop:b64_transcribe` and `speak:b64_audio` and takes whatever the hive returns. Which STT/TTS plugin, which model, which voice — all of that is configured once on `hivemind-core` (in the `hivemind-audio-binary-protocol` plugin's OVOS config) and applied uniformly to every relay that connects. Contrast a [voice-sat](https://github.com/JarbasHiveMind/HiveMind-voice-sat), which runs its own STT/TTS plugins and can point at any endpoint it likes — including a public `ovos-stt-plugin-server` / `ovos-tts-plugin-server`. The relay deliberately gives that control up to the operator.
+**The hive owns STT/TTS. The satellite cannot choose them.** The relay never names an STT or TTS engine. It emits `recognizer_loop:b64_transcribe` and `speak:b64_audio` and takes whatever the hive returns. The STT/TTS plugin, model, and voice are all configured once on `hivemind-core` (in the `hivemind-audio-binary-protocol` plugin's OVOS config) and applied uniformly to every relay that connects. Contrast a [voice-sat](https://github.com/JarbasHiveMind/HiveMind-voice-sat), which runs its own STT/TTS plugins and can point at any endpoint it likes, including a public `ovos-stt-plugin-server` or `ovos-tts-plugin-server`. The relay deliberately gives that control up to the operator.
 
-**Speech is behind auth.** Because STT/TTS live inside the hive, they inherit the protocol's access-key authentication. They are not an open network service anyone can call — a client must be a credentialed member of the mesh to transcribe or synthesise. A public OVOS plugin server has no such gate; HiveMind makes speech a first-class, authenticated capability of the hive itself.
+**Speech is behind auth.** Because STT/TTS live inside the hive, they inherit the protocol's access-key authentication. They are not an open network service anyone can call. A client must be a credentialed member of the mesh to transcribe or synthesise. A public OVOS plugin server has no such gate. HiveMind makes speech an authenticated capability of the hive itself.
 
-**b64 vs binary — the same job, two transports.** The relay carries audio as base64-encoded WAV over the JSON bus (`b64_transcribe` / `b64_audio`). [mic-satellite](https://github.com/JarbasHiveMind/hivemind-mic-satellite) does the equivalent over the binary protocol (`HiveMessageType.BINARY` / `RAW_AUDIO`), which avoids the ~33% base64 overhead. Relay is the reference implementation for the b64 path; it could be built on the binary protocol instead. Choose b64 for simplicity and debuggability, binary for bandwidth.
+**b64 vs binary: the same job, two transports.** The relay carries audio as base64-encoded WAV over the JSON bus (`b64_transcribe` / `b64_audio`). [mic-satellite](https://github.com/JarbasHiveMind/hivemind-mic-satellite) does the equivalent over the binary protocol (`HiveMessageType.BINARY` / `RAW_AUDIO`), which avoids the roughly 33% base64 overhead. Relay is the reference implementation for the b64 path. It could be built on the binary protocol instead. Choose b64 for simplicity and easy debugging. Choose binary for bandwidth.
 
 ## Dependencies
 
 The relay runs on the OVOS **bus-client 2.x** stack. Runtime dependencies are
-declared in `pyproject.toml` (the single packaging source of truth — there is no
+declared in `pyproject.toml` (the single packaging source of truth, there is no
 `requirements.txt` or `setup.py`):
 
 | Dependency | Floor | Role |
@@ -174,4 +174,7 @@ PHAL plugins handle platform-specific hardware (LEDs, buttons, display on device
 | Requires `hivemind-audio-binary-protocol` plugin | Yes | **Yes** | No |
 | Device resource requirement | Minimal | Low | High |
 
-Voice relay is the best fit when: the device is resource-constrained (no STT/TTS), privacy or latency of wakeword detection matters, and a `hivemind-core` server with the `hivemind-audio-binary-protocol` plugin is available.
+Voice relay is the best fit when the device is resource-constrained (no STT/TTS), when privacy or latency of wakeword detection matters, and when a `hivemind-core` server with the `hivemind-audio-binary-protocol` plugin is available.
+
+---
+[← Configuration](configuration.md) · [Home](index.md) · [Deployment →](deployment.md)
