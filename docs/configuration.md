@@ -101,7 +101,7 @@ The default `ovos-vad-plugin-silero` works well in most environments. Alternativ
 
 | Plugin | Notes |
 |---|---|
-| `ovos-vad-plugin-silero` | Default; neural, accurate |
+| `ovos-vad-plugin-silero` | Default, neural, accurate |
 | `ovos-vad-plugin-webrtcvad` | Lighter, rule-based |
 
 Full list: [OVOS VAD Plugins](https://openvoiceos.github.io/ovos-technical-manual//311-vad_plugins/#list-of-vad-plugins)
@@ -110,12 +110,12 @@ Full list: [OVOS VAD Plugins](https://openvoiceos.github.io/ovos-technical-manua
 
 | Plugin type | Config path | Notes |
 |---|---|---|
-| G2P | `tts.g2p_module` | Grapheme-to-phoneme for mouth animation; not required for audio |
+| G2P | `tts.g2p_module` | Grapheme-to-phoneme for mouth animation, not required for audio |
 | Media Playback | `Audio.backends` | Enables media commands ("play Metallica") |
-| OCP Plugins | — | URL resolvers for media backends |
-| Dialog Transformers | — | Text post-processing before TTS request is sent |
-| TTS Transformers | — | Audio post-processing after TTS audio received |
-| PHAL | — | Platform hardware abstraction; auto-loaded if `ovos-PHAL` is installed |
+| OCP Plugins | n/a | URL resolvers for media backends |
+| Dialog Transformers | n/a | Text post-processing before TTS request is sent |
+| TTS Transformers | n/a | Audio post-processing after TTS audio received |
+| PHAL | n/a | Platform hardware abstraction, auto-loaded if `ovos-PHAL` is installed |
 
 ### Example mycroft.conf
 
@@ -137,4 +137,7 @@ Full list: [OVOS VAD Plugins](https://openvoiceos.github.io/ovos-technical-manua
 
 ## What is NOT configurable here
 
-STT and TTS plugins are **not configured on the relay device** — they run on the `hivemind-core` server (via the `hivemind-audio-binary-protocol` plugin). Configure them in the server's OVOS config.
+STT and TTS plugins are **not configured on the relay device**. They run on the `hivemind-core` server (via the `hivemind-audio-binary-protocol` plugin). Configure them in the server's OVOS config.
+
+---
+[← Getting started](getting-started.md) · [Home](index.md) · [Architecture →](architecture.md)

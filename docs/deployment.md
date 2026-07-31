@@ -146,3 +146,6 @@ When connecting to a server over TLS (`wss://`):
   ```ini
   ExecStart=/home/YOUR_USER/.local/bin/hivemind-voice-relay --selfsigned
   ```
+
+---
+[← Architecture](architecture.md) · [Home](index.md) · [Development →](development.md)
