@@ -58,7 +58,7 @@ pip install HiveMind-voice-relay
 **1. Configure identity** (one-time):
 
 ```bash
-hivemind-client set-identity --key YOUR_ACCESS_KEY --password YOUR_PASSWORD --host wss://your-listener-host
+hivemind-client set-identity --key YOUR_ACCESS_KEY --password YOUR_PASSWORD --host wss://your-hivemind-host
 ```
 
 **2. Run:**
