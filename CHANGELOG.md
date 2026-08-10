@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0a1](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.3.0a1) (2026-08-10)
+
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.2.0a2...1.3.0a1)
+
+**Merged pull requests:**
+
+- feat: client-side transformer pipelines [\#31](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/31) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [1.2.0a2](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.2.0a2) (2026-07-31)
 
 [Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.2.0a1...1.2.0a2)
