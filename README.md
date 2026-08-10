@@ -104,8 +104,10 @@ Voice Relay reads `~/.config/mycroft/mycroft.conf` (standard OVOS config).
 | G2P | `tts.g2p_module` | n/a | No |
 | Media Playback | `Audio.backends` | n/a | No |
 | OCP Plugins | n/a | n/a | No |
-| Dialog Transformers | n/a | n/a | No |
-| TTS Transformers | n/a | n/a | No |
+| Dialog Transformers | n/a | n/a | No (server-side only) |
+| Audio Transformers | `audio_transformers` | n/a | No |
+| Utterance Transformers | `utterance_transformers` | n/a | No |
+| TTS Transformers | `tts_transformers` | n/a | No |
 | PHAL | n/a | n/a | No (auto-loaded if installed) |
 
 See [docs/configuration.md](docs/configuration.md) for full details and plugin swap instructions.
@@ -125,7 +127,6 @@ Built on [ovos-simple-listener](https://github.com/TigreGotico/ovos-simple-liste
 
 **Not supported** (use [HiveMind-voice-sat](https://github.com/JarbasHiveMind/HiveMind-voice-sat) if you need these):
 - Local STT / TTS plugins
-- Audio Transformers
 - Continuous / Hybrid / Recording / Sleep listening modes
 - Multiple wake words
 

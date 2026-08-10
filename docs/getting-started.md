@@ -14,7 +14,7 @@
 Install the `hivemind-audio-binary-protocol` plugin on a `hivemind-core` server that has the resources to run STT and TTS models. Then:
 
 1. Install `hivemind-audio-binary-protocol` and (re)start `hivemind-core`.
-2. Create a client credential (access key + password) using `hivemind-client add-client`.
+2. Create a client credential (access key + password) using `hivemind-core add-client` on the server.
 3. Note the host address and port (default `5678`).
 
 ### Python
@@ -48,12 +48,12 @@ hivemind-client set-identity \
   --port 5678
 ```
 
-Credentials are written to `~/.config/hivemind/identity2.json`. After this step you can run the satellite without passing flags every time.
+Credentials are written to `~/.config/hivemind/_identity.json`. After this step you can run the satellite without passing flags every time.
 
 To inspect the stored identity:
 
 ```bash
-hivemind-client get-identity
+hivemind-client test-identity
 ```
 
 ---
