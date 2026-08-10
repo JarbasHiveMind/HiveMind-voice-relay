@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0a4](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.3.0a4) (2026-08-10)
+
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.3.0a3...1.3.0a4)
+
+**Merged pull requests:**
+
+- docs: correct claims that no longer match the code [\#39](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/39) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [1.3.0a3](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.3.0a3) (2026-08-10)
 
 [Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.3.0a2...1.3.0a3)
