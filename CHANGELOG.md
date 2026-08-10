@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0a2](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.3.0a2) (2026-08-10)
+
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.3.0a1...1.3.0a2)
+
+**Merged pull requests:**
+
+- docs: drop misleading listener terminology [\#34](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/34) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [1.3.0a1](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.3.0a1) (2026-08-10)
 
 [Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.2.0a2...1.3.0a1)
