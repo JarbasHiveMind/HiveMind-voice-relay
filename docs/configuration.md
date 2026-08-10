@@ -24,10 +24,10 @@ Manage the identity file with `hivemind-client`:
 hivemind-client set-identity --key KEY --password PASS --host wss://host --port 5678
 
 # Read
-hivemind-client get-identity
+hivemind-client test-identity
 ```
 
-The identity is stored at `~/.config/hivemind/identity2.json`.
+The identity is stored at `~/.config/hivemind/_identity.json`.
 
 ---
 
@@ -113,8 +113,10 @@ Full list: [OVOS VAD Plugins](https://openvoiceos.github.io/ovos-technical-manua
 | G2P | `tts.g2p_module` | Grapheme-to-phoneme for mouth animation, not required for audio |
 | Media Playback | `Audio.backends` | Enables media commands ("play Metallica") |
 | OCP Plugins | n/a | URL resolvers for media backends |
-| Dialog Transformers | n/a | Text post-processing before TTS request is sent |
-| TTS Transformers | n/a | Audio post-processing after TTS audio received |
+| Dialog Transformers | n/a | Text post-processing before the TTS request is sent, server-side only |
+| Audio Transformers | `audio_transformers` | Applied to captured speech before it is sent upstream |
+| Utterance Transformers | `utterance_transformers` | Applied to the transcript before it is emitted |
+| TTS Transformers | `tts_transformers` | Audio post-processing after TTS audio received |
 | PHAL | n/a | Platform hardware abstraction, auto-loaded if `ovos-PHAL` is installed |
 
 ### Transformer pipelines

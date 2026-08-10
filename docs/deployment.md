@@ -23,7 +23,7 @@ Environment=HOME=/home/YOUR_USER
 WantedBy=multi-user.target
 ```
 
-Replace `YOUR_USER` with the user account under which the relay should run (the one whose `~/.config/hivemind/identity2.json` and `~/.config/mycroft/mycroft.conf` files are set up).
+Replace `YOUR_USER` with the user account under which the relay should run (the one whose `~/.config/hivemind/_identity.json` and `~/.config/mycroft/mycroft.conf` files are set up).
 
 Enable and start:
 
