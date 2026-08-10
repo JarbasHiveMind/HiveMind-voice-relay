@@ -164,3 +164,21 @@ endpoints mocked. See **[docs/development.md](docs/development.md)**.
 ## License
 
 [Apache-2.0](LICENSE)
+
+## Transformer pipelines
+
+The relay can run OVOS transformer plugins on-device, configured in this
+device's `mycroft.conf`:
+
+- `audio_transformers` — applied to captured speech before it is sent to the
+  server for STT (e.g. denoise).
+- `utterance_transformers` — applied to the transcript before it is emitted
+  as `recognizer_loop:utterance`; a plugin cancellation (OVOS-TRANSFORM §8.1)
+  drops the utterance.
+- `tts_transformers` — applied to received TTS audio before playback (e.g.
+  per-device sound effects).
+
+Loading is opt-in: a plugin only runs if named in its section. **Avoid
+double-processing**: if the HiveMind server or the OVOS agent behind it
+enables the same pipeline, data gets processed twice — enable each plugin on
+exactly one side.

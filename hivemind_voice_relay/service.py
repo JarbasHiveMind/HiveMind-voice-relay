@@ -8,6 +8,9 @@ from ovos_bus_client.message import Message, dig_for_message
 from ovos_config import Configuration
 from ovos_plugin_manager.microphone import OVOSMicrophoneFactory
 from ovos_plugin_manager.templates.stt import STT
+from ovos_plugin_manager.transformer_services import (AudioTransformersService,
+                                                      TTSTransformersService,
+                                                      UtteranceTransformersService)
 from ovos_plugin_manager.templates.tts import TTS
 from ovos_plugin_manager.utils.tts_cache import hash_sentence
 from ovos_plugin_manager.vad import OVOSVADFactory
@@ -70,6 +73,12 @@ def on_error(e='Unknown'):
 class HMCallbacks(ListenerCallbacks):
     def __init__(self, bus: Optional[HiveMessageBusClient] = None):
         self.bus = bus or get_bus()
+        # client-side utterance transformers, opt-in via this device's
+        # mycroft.conf. NOTE: if the hivemind server (or the OVOS agent
+        # behind it) enables the same plugin, text is processed twice —
+        # enable each plugin on exactly one side.
+        self.utterance_transformers = UtteranceTransformersService(
+            config=Configuration().get("utterance_transformers") or {})
 
     def listen_callback(self):
         LOG.info("New loop state: IN_COMMAND")
@@ -88,8 +97,19 @@ class HMCallbacks(ListenerCallbacks):
 
     def text_callback(self, utterance: str, lang: str):
         LOG.info(f"STT: {utterance}")
+        utterances = [utterance]
+        context = {}
+        if self.utterance_transformers.plugins:
+            utterances, context = self.utterance_transformers.transform(
+                utterances, {"lang": lang})
+            if context.get("canceled"):
+                LOG.info(f"utterance canceled by {context.get('cancel_by')}: "
+                         f"{context.get('cancel_reason')}")
+                self.bus.internal_bus.emit(Message("ovos.utterance.cancelled"))
+                return
         self.bus.emit(Message("recognizer_loop:utterance",
-                              {"utterances": [utterance], "lang": lang}))
+                              {"utterances": utterances, "lang": lang},
+                              context))
 
 
 class HiveMindSTT(STT):
@@ -98,6 +118,10 @@ class HiveMindSTT(STT):
         self.bus = bus
         self._response = threading.Event()
         self._transcripts: List[Tuple[str, float]] = []
+        # client-side audio transformers applied before audio is sent to the
+        # server for STT; opt-in via this device's mycroft.conf
+        self.audio_transformers = AudioTransformersService(
+            config=Configuration().get("audio_transformers") or {})
         self.bus.on_mycroft("recognizer_loop:b64_transcribe.response",
                             self.handle_transcripts)
 
@@ -106,6 +130,9 @@ class HiveMindSTT(STT):
         self._response.set()
 
     def execute(self, audio: AudioData, language: Optional[str] = None) -> str:
+        if self.audio_transformers.plugins:
+            chunk, _ = self.audio_transformers.transform(audio.frame_data)
+            audio = AudioData(chunk, audio.sample_rate, audio.sample_width)
         wav = audio.get_wav_data()
         b64audio = pybase64.b64encode(wav).decode("utf-8")
         m = dig_for_message() or Message("")
@@ -132,6 +159,10 @@ class HMPlayback(PlaybackService):
         super().__init__(ready_hook, error_hook, stopping_hook, alive_hook, started_hook, watchdog=watchdog,
                          bus=bus, validate_source=False,
                          disable_fallback=True)
+        # client-side tts transformers applied to received TTS audio before
+        # playback; opt-in via this device's mycroft.conf
+        self.tts_transformers = TTSTransformersService(
+            config=Configuration().get("tts_transformers") or {})
         self.bus.on("speak:b64_audio.response", self.handle_tts_b64_response)
         self.start()
 
@@ -158,6 +189,10 @@ class HMPlayback(PlaybackService):
         audio_file = f"/tmp/{hash_sentence(utt)}.wav"
         with open(audio_file, "wb") as f:
             f.write(pybase64.b64decode(b64data))
+
+        if self.tts_transformers.plugins:
+            audio_file, _ = self.tts_transformers.transform(
+                audio_file, {"lang": message.data.get("lang")})
 
         # queue audio for playback
         TTS.queue.put(
