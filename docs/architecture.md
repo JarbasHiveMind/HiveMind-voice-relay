@@ -111,7 +111,7 @@ Messages flow as `HiveMessage` packets over the WebSocket. OVOS-style `Message` 
 | TTS (speak:b64_audio) | **No** | **Yes** |
 | Required by voice-relay | **No** | **Yes** |
 
-`hivemind-core` is a base mesh node. It routes HiveMessages between satellites and an OVOS instance but does not itself process audio. The [`hivemind-audio-binary-protocol`](https://github.com/JarbasHiveMind/hivemind-audio-binary-protocol) binary plugin adds the listener service that handles the `b64_transcribe` and `speak:b64_audio` protocol messages that voice-relay depends on.
+`hivemind-core` is a base mesh node. It routes HiveMessages between satellites and an OVOS instance but does not itself process audio. The [`hivemind-audio-binary-protocol`](https://github.com/JarbasHiveMind/hivemind-audio-binary-protocol) binary plugin adds the server-side audio handling for the `b64_transcribe` and `speak:b64_audio` protocol messages that voice-relay depends on.
 
 Connecting voice-relay to a plain `hivemind-core` node triggers the wakeword and sends audio, but the STT request times out and no TTS arrives.
 

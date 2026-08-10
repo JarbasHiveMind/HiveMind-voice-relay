@@ -44,7 +44,7 @@ Before connecting, store your credentials locally with `hivemind-client`:
 hivemind-client set-identity \
   --key YOUR_ACCESS_KEY \
   --password YOUR_PASSWORD \
-  --host wss://your-listener-host \
+  --host wss://your-hivemind-host \
   --port 5678
 ```
 
@@ -68,7 +68,7 @@ Or, passing flags explicitly (useful for testing before storing identity):
 
 ```bash
 hivemind-voice-relay \
-  --host wss://your-listener-host \
+  --host wss://your-hivemind-host \
   --key YOUR_ACCESS_KEY \
   --password YOUR_PASSWORD \
   --port 5678
