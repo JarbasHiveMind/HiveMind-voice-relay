@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.1a1](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.3.1a1) (2026-09-01)
+
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.3.0a5...1.3.1a1)
+
+**Merged pull requests:**
+
+- fix\(deps\): raise floor pins to proven HiveMind stack [\#43](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/43) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [1.3.0a5](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.3.0a5) (2026-08-15)
 
 [Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.3.0a4...1.3.0a5)
