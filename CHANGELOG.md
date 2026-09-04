@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.0a1](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.4.0a1) (2026-09-04)
+
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.3.1a1...1.4.0a1)
+
+**Merged pull requests:**
+
+- feat: support both b64 and binary transports for STT/TTS audio \(configurable, b64 default\) [\#46](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/46) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [1.3.1a1](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.3.1a1) (2026-09-01)
 
 [Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.3.0a5...1.3.1a1)
