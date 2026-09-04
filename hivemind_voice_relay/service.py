@@ -27,14 +27,12 @@ from hivemind_bus_client.serialization import HiveMindBinaryPayloadType
 
 
 def get_stt_transport() -> str:
-    """Which transport HiveMindSTT uses to hand a full utterance off for STT.
+    """Which transport HiveMindSTT uses to hand audio off for STT.
 
     Read from this device's ``mycroft.conf`` as top-level ``stt_transport``.
-    ``"b64"`` (default) sends base64-encoded WAV over ``recognizer_loop:b64_transcribe``,
-    unchanged from every prior release. ``"binary"`` opts into sending raw PCM
-    as a ``STT_AUDIO_TRANSCRIBE`` binary HiveMessage instead, avoiding the
-    base64 blow-up and the extra bus round-trip through JSON. Any other value
-    falls back to ``"b64"``.
+    ``"b64"`` (default) sends base64-encoded WAV over ``recognizer_loop:b64_transcribe``.
+    ``"binary"`` sends raw PCM as an ``STT_AUDIO_TRANSCRIBE`` binary HiveMessage.
+    Any other value falls back to ``"b64"``.
     """
     transport = Configuration().get("stt_transport", "b64")
     return transport if transport == "binary" else "b64"
@@ -44,10 +42,9 @@ def get_tts_transport() -> str:
     """Which transport HMPlayback uses to request synthesized TTS audio.
 
     Read from this device's ``mycroft.conf`` as top-level ``tts_transport``.
-    ``"b64"`` (default) requests ``speak:b64_audio`` and gets base64-encoded
-    WAV back, unchanged from every prior release. ``"binary"`` opts into
-    ``speak:synth`` and receives the WAV as a ``TTS_AUDIO`` binary HiveMessage
-    instead. Any other value falls back to ``"b64"``.
+    ``"b64"`` (default) requests ``speak:b64_audio`` and gets base64-encoded WAV back.
+    ``"binary"`` requests ``speak:synth`` and receives the WAV as a ``TTS_AUDIO`` binary HiveMessage.
+    Any other value falls back to ``"b64"``.
     """
     transport = Configuration().get("tts_transport", "b64")
     return transport if transport == "binary" else "b64"
@@ -230,7 +227,7 @@ class HMPlayback(PlaybackService):
         self.start()
 
     def execute_tts(self, utterance, ident, listen=False,
-                    message: Message = None):
+                    message: Optional[Message] = None):
         """Mute mic and start speaking the utterance using selected tts backend.
 
         Args:
