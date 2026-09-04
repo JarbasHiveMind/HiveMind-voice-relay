@@ -1,69 +1,214 @@
 # HiveMind Voice Relay
 
-OpenVoiceOS Relay, connect to [HiveMind](https://github.com/JarbasHiveMind/HiveMind-listener)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/HiveMind-voice-relay)](https://pypi.org/project/HiveMind-voice-relay/)
+[![Python](https://img.shields.io/pypi/pyversions/HiveMind-voice-relay)](https://pypi.org/project/HiveMind-voice-relay/)
 
-A lightweight version of [voice-satellite](https://github.com/JarbasHiveMind/HiveMind-voice-sat), but STT and TTS are sent to HiveMind instead of handled on device
+**Local wakeword detection. STT and TTS run remotely on hivemind-core with the hivemind-audio-binary-protocol plugin.**
+
+Voice Relay runs the microphone, VAD, and wakeword engine on-device. This keeps wake-word detection private and low-latency. It forwards audio to **hivemind-core** (running the **hivemind-audio-binary-protocol** plugin) for speech-to-text, and receives synthesised audio back for playback. No STT or TTS models run on the device.
+
+> Full documentation: **[docs/](docs/index.md)**
+
+---
+
+## Satellite spectrum
+
+| Satellite | Mic | VAD | Wake word | STT | TTS | Connects to |
+|---|---|---|---|---|---|---|
+| [HiveMind-cli](https://github.com/JarbasHiveMind/HiveMind-cli) | n/a | n/a | n/a | n/a | n/a | hivemind-core |
+| [hivemind-mic-satellite](https://github.com/JarbasHiveMind/hivemind-mic-satellite) | local | local | **server** | server | server | core + audio-binary-protocol |
+| **HiveMind-voice-relay** (this repo) | local | local | **local** | server | server | **core + audio-binary-protocol** |
+| [HiveMind-voice-sat](https://github.com/JarbasHiveMind/HiveMind-voice-sat) | local | local | local | local | local | hivemind-core |
+
+Voice Relay keeps wakeword detection on-device. No audio leaves the device until activation, and latency stays low. STT and TTS run on the hive instead. The point is not mainly resource savings. It is **what it means for the hive to own speech services** (see below).
+
+---
+
+## Why voice-relay: HiveMind as a service
+
+Voice-relay's real lesson is architectural. STT and TTS run *inside the hive* (the `hivemind-audio-binary-protocol` plugin on `hivemind-core`) and sit **behind the same access-key authentication** as the rest of the mesh. For a developer, the consequences matter more than the saved CPU:
+
+- **The hive owns STT/TTS.** A [voice-sat](https://github.com/JarbasHiveMind/HiveMind-voice-sat) can point at any STT/TTS plugin it likes, including a public `ovos-stt-plugin-server` or `ovos-tts-plugin-server`. A relay **cannot** choose the engine, model, or voice. The **hive operator decides**, centrally and uniformly, for every relay that connects.
+- **Speech is authenticated.** STT/TTS are not an open endpoint anyone can hit. Access is gated by the client's HiveMind credentials, exactly like every other message on the protocol.
+- **It is the reference for the b64 speech API.** The relay sends audio for STT and receives speech for TTS as base64-encoded WAV over the HiveMessage bus (`recognizer_loop:b64_transcribe`, `speak:b64_audio`). This is the same work [mic-satellite](https://github.com/JarbasHiveMind/hivemind-mic-satellite) does over the binary protocol. Relay illustrates the b64 path. It could equally use binary.
+
+Choose voice-relay when you want HiveMind to operate STT/TTS as a **governed, authenticated service**, uniform and centrally controlled, with wakeword kept local for latency and privacy. Lower device resource use is a consequence, not the goal.
+
+---
 
 ## Server requirements
 
-> ⚠️ `hivemind-listener` is required server side, the default `hivemind-core` does not provide STT and TTS capabilities.
+> **Your `hivemind-core` server must have the [hivemind-audio-binary-protocol](https://github.com/JarbasHiveMind/hivemind-audio-binary-protocol) binary plugin installed.** Plain `hivemind-core` does not handle STT or TTS. Connecting to it results in silence: no transcription and no spoken response.
+>
+> Alternatively, run `hivemind-core` together with `ovos-audio` and `ovos-dinkum-listener` to provide the same capabilities.
 
-> Alternatively run `hivemind-core` together with `ovos-audio` and `ovos-dinkum-listener`
-
-The regular voice satellite is built on top of [ovos-dinkum-listener](https://github.com/OpenVoiceOS/ovos-dinkum-listener) and is full featured supporting all plugins
-
-This repo is built on top of [ovos-simple-listener](https://github.com/TigreGotico/ovos-simple-listener), while it needs less resources it is also **missing** some features
-
-- STT plugin
-- TTS plugin
-- Audio Transformers plugins
-- Continuous Listening
-- Hybrid Listening
-- Recording Mode
-- Sleep Mode
-- Multiple WakeWords
-
-If you need an even lighter implementation, consider [hivemind-mic-satellite](https://github.com/JarbasHiveMind/hivemind-mic-satellite) to also offload wake word to the server
+---
 
 ## Install
 
-Install with pip
-
 ```bash
-$ pip install HiveMind-voice-relay
+pip install HiveMind-voice-relay
 ```
 
-## Usage
+---
+
+## 60-second quickstart
+
+**1. Configure identity** (one-time):
 
 ```bash
+hivemind-client set-identity --key YOUR_ACCESS_KEY --password YOUR_PASSWORD --host wss://your-hivemind-host
+```
+
+**2. Run:**
+
+```bash
+hivemind-voice-relay
+```
+
+**3. Speak your wake word.** The default wake word is `hey mycroft` (configured in `~/.config/mycroft/mycroft.conf`).
+
+---
+
+## CLI flags
+
+```
 Usage: hivemind-voice-relay [OPTIONS]
 
-  connect to HiveMind
+  connect to hivemind-core running the audio binary protocol
 
 Options:
-  --host TEXT      hivemind host
+  --host TEXT      hivemind host (ws:// or wss://)
   --key TEXT       Access Key
   --password TEXT  Password for key derivation
-  --port INTEGER   HiveMind port number
-  --selfsigned     accept self signed certificates
+  --port INTEGER   HiveMind port number (default: 5678)
+  --selfsigned     Accept self-signed TLS certificates
+  --siteid TEXT    Location identifier for message context
   --help           Show this message and exit.
-
 ```
+
+All flags fall back to values stored by `hivemind-client set-identity`.
+
+---
 
 ## Configuration
 
-Voice relay is built on top of [ovos-simple-listener](https://github.com/TigreGotico/ovos-simple-listener) and [ovos-audio](https://github.com/OpenVoiceOS/ovos-audio), it uses the default OpenVoiceOS configuration `~/.config/mycroft/mycroft.conf`
+Voice Relay reads `~/.config/mycroft/mycroft.conf` (standard OVOS config).
 
-Supported plugin types:
+| Plugin type | Config key | Default | Required |
+|---|---|---|---|
+| Microphone | `microphone.module` | `ovos-microphone-plugin-alsa` | Yes |
+| VAD | `listener.VAD.module` | `ovos-vad-plugin-silero` | Yes |
+| Wake word | `listener.wake_word` | `hey_mycroft` | Yes |
+| G2P | `tts.g2p_module` | n/a | No |
+| Media Playback | `Audio.backends` | n/a | No |
+| OCP Plugins | n/a | n/a | No |
+| Dialog Transformers | n/a | n/a | No (server-side only) |
+| Audio Transformers | `audio_transformers` | n/a | No |
+| Utterance Transformers | `utterance_transformers` | n/a | No |
+| TTS Transformers | `tts_transformers` | n/a | No |
+| STT transport | `stt_transport` | `b64` | No |
+| TTS transport | `tts_transport` | `b64` | No |
+| PHAL | n/a | n/a | No (auto-loaded if installed) |
 
-| Plugin Type | Description | Required | Link |
-|-------------|-------------|----------|------|
-| Microphone | Captures voice input | Yes | [Microphone](https://openvoiceos.github.io/ovos-technical-manual//310-mic_plugins/#microphone-plugins) |
-| VAD | Voice Activity Detection | Yes | [VAD](https://openvoiceos.github.io/ovos-technical-manual//311-vad_plugins/#list-of-vad-plugins) |
-| WakeWord | Detects wake words for interaction | Yes | [WakeWord](https://openvoiceos.github.io/ovos-technical-manual//312-wake_word_plugins/#list-of-wake-word-plugins) |
-| G2P | grapheme-to-phoneme (G2P), used to simulate mouth movements  | No | [G2P](https://openvoiceos.github.io/ovos-technical-manual//321-g2p_plugins/) |
-| Media Playback Plugins | Enables media playback (e.g., "play Metallica") | No | [Media Playback Plugins](https://openvoiceos.github.io/ovos-technical-manual/371-media_plugins/) |
-| OCP Plugins | Provides playback support for URLs (e.g., YouTube) | No | [OCP Plugins](https://openvoiceos.github.io/ovos-technical-manual/370-ocp_plugins/) |
-| Dialog Transformers | Processes text before text-to-speech (TTS) | No | [Dialog Transformers](https://openvoiceos.github.io/ovos-technical-manual/330-transformer_plugins/) |
-| TTS Transformers | Processes audio after text-to-speech (TTS) | No | [TTS Transformers](https://openvoiceos.github.io/ovos-technical-manual/103-audio_service/#transformer-plugins) |
-| PHAL | Provides platform-specific support (e.g., Mark 1) | No | [PHAL](https://openvoiceos.github.io/ovos-technical-manual/340-PHAL/#plugins)
+See [docs/configuration.md](docs/configuration.md) for full details and plugin swap instructions.
+
+---
+
+## Features and limitations
+
+Built on [ovos-simple-listener](https://github.com/TigreGotico/ovos-simple-listener). Compared to the full voice-satellite:
+
+**Present:**
+- Microphone capture, VAD, and wakeword detection, all local
+- Audio forwarded to hivemind-core (hivemind-audio-binary-protocol plugin) for STT, over base64-encoded WAV or the binary protocol (configurable, see below)
+- TTS audio synthesised server-side and streamed back for local playback, over the same choice of transports
+- PHAL (platform hardware abstraction) auto-loaded if installed
+- Standard OVOS plugin system for mic, VAD, and wakeword
+
+**Not supported** (use [HiveMind-voice-sat](https://github.com/JarbasHiveMind/HiveMind-voice-sat) if you need these):
+- Local STT / TTS plugins
+- Continuous / Hybrid / Recording / Sleep listening modes
+- Multiple wake words
+
+---
+
+## Related
+
+| Project | Role |
+|---|---|
+| [hivemind-audio-binary-protocol](https://github.com/JarbasHiveMind/hivemind-audio-binary-protocol) | Required `hivemind-core` plugin, provides server-side STT and TTS |
+| [hivemind-core](https://github.com/JarbasHiveMind/HiveMind-core) | Base mesh node (no STT/TTS) |
+| [HiveMind-cli](https://github.com/JarbasHiveMind/HiveMind-cli) | Text-only satellite |
+| [hivemind-mic-satellite](https://github.com/JarbasHiveMind/hivemind-mic-satellite) | Thinnest audio satellite (no local wakeword) |
+| [HiveMind-voice-sat](https://github.com/JarbasHiveMind/HiveMind-voice-sat) | Full local stack satellite |
+| [hivemind-bus-client](https://github.com/JarbasHiveMind/hivemind-bus-client) | HiveMind WebSocket client library |
+| [ovos-simple-listener](https://github.com/TigreGotico/ovos-simple-listener) | Lightweight listener library used internally |
+
+---
+
+## Development
+
+Install from source with the end-to-end test extra, then run the suite:
+
+```bash
+uv pip install -e ".[e2e]"
+pytest tests/
+```
+
+`pyproject.toml` is the single packaging source of truth. The E2E suite runs a
+real `hivemind-core` master in-process and the real relay client over a real
+`HiveMessageBusClient`, with the microphone/wakeword and the remote STT/TTS
+endpoints mocked. See **[docs/development.md](docs/development.md)**.
+
+---
+
+## License
+
+[Apache-2.0](LICENSE)
+
+## Transformer pipelines
+
+The relay can run OVOS transformer plugins on-device, configured in this
+device's `mycroft.conf`:
+
+- `audio_transformers` — applied to captured speech before it is sent to the
+  server for STT (e.g. denoise).
+- `utterance_transformers` — applied to the transcript before it is emitted
+  as `recognizer_loop:utterance`; a plugin cancellation (OVOS-TRANSFORM §8.1)
+  drops the utterance.
+- `tts_transformers` — applied to received TTS audio before playback (e.g.
+  per-device sound effects).
+
+## STT and TTS transport
+
+Each direction of audio hand-off between Voice Relay and `hivemind-core` has
+its own transport, set independently in `mycroft.conf`:
+
+```json
+{
+  "stt_transport": "b64",
+  "tts_transport": "b64"
+}
+```
+
+Both keys default to `b64`: the utterance recorded locally is sent as
+base64-encoded WAV over `recognizer_loop:b64_transcribe`, and synthesized
+speech comes back the same way over `speak:b64_audio`. This is the transport
+every prior release used, and it stays the default because it is the simplest
+to reason about and to reproduce in a demo — plain JSON, nothing binary to
+inspect.
+
+Setting either key to `binary` switches that direction to the HiveMind binary
+protocol instead: raw PCM sent as a `STT_AUDIO_TRANSCRIBE` frame for STT, and
+the WAV file returned as a `TTS_AUDIO` frame for TTS. Binary transport skips
+the ~33% size increase base64 adds and the extra JSON framing, so prefer it
+on bandwidth-constrained links or when running many satellites against one
+`hivemind-core` instance. The two keys are independent — for example STT can
+stay on `b64` while TTS moves to `binary`, or vice versa.
+
+Loading is opt-in: a plugin only runs if named in its section. **Avoid
+double-processing**: if the HiveMind server or the OVOS agent behind it
+enables the same pipeline, data gets processed twice — enable each plugin on
+exactly one side.

@@ -1,21 +1,129 @@
 # Changelog
 
-## [1.0.3a1](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.0.3a1) (2026-01-23)
+## [1.4.0a2](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.4.0a2) (2026-09-04)
 
-[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.0.2a1...1.0.3a1)
-
-**Merged pull requests:**
-
-- fix: session\_id [\#15](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/15) ([JarbasAl](https://github.com/JarbasAl))
-
-## [1.0.2a1](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.0.2a1) (2025-12-18)
-
-[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.0.1...1.0.2a1)
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.4.0a1...1.4.0a2)
 
 **Merged pull requests:**
 
-- chore: Configure Renovate [\#9](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/9) ([renovate[bot]](https://github.com/apps/renovate))
-- Update README.md [\#7](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/7) ([timonvanhasselt](https://github.com/timonvanhasselt))
+- Polish: transport docstrings and type hints [\#48](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/48) ([JarbasAl](https://github.com/JarbasAl))
+
+## [1.4.0a1](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.4.0a1) (2026-09-04)
+
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.3.1a1...1.4.0a1)
+
+**Merged pull requests:**
+
+- feat: support both b64 and binary transports for STT/TTS audio \(configurable, b64 default\) [\#46](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/46) ([JarbasAl](https://github.com/JarbasAl))
+
+## [1.3.1a1](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.3.1a1) (2026-09-01)
+
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.3.0a5...1.3.1a1)
+
+**Merged pull requests:**
+
+- fix\(deps\): raise floor pins to proven HiveMind stack [\#43](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/43) ([JarbasAl](https://github.com/JarbasAl))
+
+## [1.3.0a5](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.3.0a5) (2026-08-15)
+
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.3.0a4...1.3.0a5)
+
+**Merged pull requests:**
+
+- docs: add AGENTS.md with per-repo agent conventions [\#41](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/41) ([JarbasAl](https://github.com/JarbasAl))
+
+## [1.3.0a4](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.3.0a4) (2026-08-10)
+
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.3.0a3...1.3.0a4)
+
+**Merged pull requests:**
+
+- docs: correct claims that no longer match the code [\#39](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/39) ([JarbasAl](https://github.com/JarbasAl))
+
+## [1.3.0a3](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.3.0a3) (2026-08-10)
+
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.3.0a2...1.3.0a3)
+
+**Merged pull requests:**
+
+- chore\(ci\): drop the broken, redundant Dependabot config [\#37](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/37) ([JarbasAl](https://github.com/JarbasAl))
+
+## [1.3.0a2](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.3.0a2) (2026-08-10)
+
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.3.0a1...1.3.0a2)
+
+**Merged pull requests:**
+
+- docs: drop misleading listener terminology [\#34](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/34) ([JarbasAl](https://github.com/JarbasAl))
+
+## [1.3.0a1](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.3.0a1) (2026-08-10)
+
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.2.0a2...1.3.0a1)
+
+**Merged pull requests:**
+
+- feat: client-side transformer pipelines [\#31](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/31) ([JarbasAl](https://github.com/JarbasAl))
+
+## [1.2.0a2](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.2.0a2) (2026-07-31)
+
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.2.0a1...1.2.0a2)
+
+**Merged pull requests:**
+
+- docs: rewrite README in Simplified Technical English [\#32](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/32) ([JarbasAl](https://github.com/JarbasAl))
+
+## [1.2.0a1](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.2.0a1) (2026-06-25)
+
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.1.0a4...1.2.0a1)
+
+**Merged pull requests:**
+
+- feat: modernize relay onto the ovos-bus-client 2.x stack \(deps, CI, docs, real-client E2E\) [\#29](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/29) ([JarbasAl](https://github.com/JarbasAl))
+
+## [1.1.0a4](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.1.0a4) (2026-06-23)
+
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.1.0a3...1.1.0a4)
+
+**Merged pull requests:**
+
+- test\(e2e\): refresh hivescope pin 0.3.0a1→0.5.0a2; move policy pins into pyproject [\#26](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/26) ([JarbasAl](https://github.com/JarbasAl))
+
+## [1.1.0a3](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.1.0a3) (2026-06-05)
+
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.1.0a2...1.1.0a3)
+
+**Merged pull requests:**
+
+- Update dependency hivescope to v0.3.0a3 [\#22](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/22) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [1.1.0a2](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.1.0a2) (2026-06-05)
+
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.1.0a1...1.1.0a2)
+
+**Merged pull requests:**
+
+- docs: reframe voice-relay around HiveMind-as-a-service [\#23](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/23) ([JarbasAl](https://github.com/JarbasAl))
+
+## [1.1.0a1](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.1.0a1) (2026-06-05)
+
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.0.4a2...1.1.0a1)
+
+**Merged pull requests:**
+
+- feat: modernize deps, CI to gh-automations@dev, ACL e2e tests [\#20](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/20) ([JarbasAl](https://github.com/JarbasAl))
+
+## [1.0.4a2](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.0.4a2) (2026-02-03)
+
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.0.4a1...1.0.4a2)
+
+## [1.0.4a1](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.0.4a1) (2026-02-03)
+
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.0.3...1.0.4a1)
+
+**Merged pull requests:**
+
+- chore\(deps\): update actions/setup-python action to v6 [\#14](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/14) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update actions/checkout action to v6 [\#12](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/12) ([renovate[bot]](https://github.com/apps/renovate))
 
 
 
