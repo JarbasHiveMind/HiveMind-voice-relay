@@ -108,6 +108,8 @@ Voice Relay reads `~/.config/mycroft/mycroft.conf` (standard OVOS config).
 | Audio Transformers | `audio_transformers` | n/a | No |
 | Utterance Transformers | `utterance_transformers` | n/a | No |
 | TTS Transformers | `tts_transformers` | n/a | No |
+| STT transport | `stt_transport` | `b64` | No |
+| TTS transport | `tts_transport` | `b64` | No |
 | PHAL | n/a | n/a | No (auto-loaded if installed) |
 
 See [docs/configuration.md](docs/configuration.md) for full details and plugin swap instructions.
@@ -120,8 +122,8 @@ Built on [ovos-simple-listener](https://github.com/TigreGotico/ovos-simple-liste
 
 **Present:**
 - Microphone capture, VAD, and wakeword detection, all local
-- Audio forwarded to hivemind-core (hivemind-audio-binary-protocol plugin) for STT (base64-encoded WAV over the HiveMessage bus)
-- TTS audio synthesised server-side and streamed back for local playback
+- Audio forwarded to hivemind-core (hivemind-audio-binary-protocol plugin) for STT, over base64-encoded WAV or the binary protocol (configurable, see below)
+- TTS audio synthesised server-side and streamed back for local playback, over the same choice of transports
 - PHAL (platform hardware abstraction) auto-loaded if installed
 - Standard OVOS plugin system for mic, VAD, and wakeword
 
@@ -178,6 +180,33 @@ device's `mycroft.conf`:
   drops the utterance.
 - `tts_transformers` — applied to received TTS audio before playback (e.g.
   per-device sound effects).
+
+## STT and TTS transport
+
+Each direction of audio hand-off between Voice Relay and `hivemind-core` has
+its own transport, set independently in `mycroft.conf`:
+
+```json
+{
+  "stt_transport": "b64",
+  "tts_transport": "b64"
+}
+```
+
+Both keys default to `b64`: the utterance recorded locally is sent as
+base64-encoded WAV over `recognizer_loop:b64_transcribe`, and synthesized
+speech comes back the same way over `speak:b64_audio`. This is the transport
+every prior release used, and it stays the default because it is the simplest
+to reason about and to reproduce in a demo — plain JSON, nothing binary to
+inspect.
+
+Setting either key to `binary` switches that direction to the HiveMind binary
+protocol instead: raw PCM sent as a `STT_AUDIO_TRANSCRIBE` frame for STT, and
+the WAV file returned as a `TTS_AUDIO` frame for TTS. Binary transport skips
+the ~33% size increase base64 adds and the extra JSON framing, so prefer it
+on bandwidth-constrained links or when running many satellites against one
+`hivemind-core` instance. The two keys are independent — for example STT can
+stay on `b64` while TTS moves to `binary`, or vice versa.
 
 Loading is opt-in: a plugin only runs if named in its section. **Avoid
 double-processing**: if the HiveMind server or the OVOS agent behind it
