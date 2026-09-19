@@ -52,7 +52,7 @@ def get_tts_transport() -> str:
 
 def get_bus(bin_callbacks: Optional[BinaryDataCallbacks] = None) -> HiveMessageBusClient:
     # TODO - kwargs
-    identity = NodeIdentity()
+    identity = NodeIdentity(app_name="voice-relay")
     siteid = identity.site_id or "unknown"
     host = identity.default_master
     port = 5678
@@ -75,6 +75,7 @@ def get_bus(bin_callbacks: Optional[BinaryDataCallbacks] = None) -> HiveMessageB
                                host=host,
                                useragent="VoiceRelayV1.0.0",
                                internal_bus=FakeBus(),
+                               identity=identity,
                                **kwargs)
     bus.connect(site_id=siteid)
     return bus
