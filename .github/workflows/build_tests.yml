@@ -1,25 +1,19 @@
-name: Run Build Tests
+name: Build Tests
+
 on:
-  push:
+  pull_request:
+    branches: [dev, master]
   workflow_dispatch:
 
 jobs:
-  build_tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          ref: ${{ github.head_ref }}
-      - name: Setup Python
-        uses: actions/setup-python@v1
-        with:
-          python-version: 3.8
-      - name: Install Build Tools
-        run: |
-          python -m pip install build wheel
-      - name: Build Distribution Packages
-        run: |
-          python setup.py bdist_wheel
-      - name: Install package
-        run: |
-          pip install .
+  build:
+    uses: OpenVoiceOS/gh-automations/.github/workflows/build-tests.yml@dev
+    with:
+      python_versions: '["3.10", "3.11", "3.12", "3.13"]'
+      system_deps: 'libasound2-dev'
+      # version policy is in pyproject (the `test` extra aliases `e2e`); no
+      # pre_install pins here. The dedicated E2E workflow runs tests/e2e/ with
+      # the `e2e` extra; this build job exercises the whole tests/ tree and the
+      # clean install across all supported Python versions.
+      install_extras: 'test'
+      test_path: 'tests/'
