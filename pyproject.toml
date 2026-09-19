@@ -13,7 +13,7 @@ dynamic = ["version"]
 dependencies = [
     # HiveMind transport + identity. 1.0.16a1 is the current bus-client 1.0.x
     # line (it requires ovos-bus-client>=2.0.0a3).
-    "hivemind-bus-client>=1.0.16a1",
+    "hivemind-bus-client>=1.2.1a1",
     # Pin the bus-client 2.x floor explicitly so the whole stack resolves on
     # 2.x (no --pre needed: a prerelease floor pin resolves it).
     "ovos-bus-client>=2.9.1a1",
