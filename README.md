@@ -31,7 +31,7 @@ Voice-relay's real lesson is architectural. STT and TTS run *inside the hive* (t
 
 - **The hive owns STT/TTS.** A [voice-sat](https://github.com/JarbasHiveMind/HiveMind-voice-sat) can point at any STT/TTS plugin it likes, including a public `ovos-stt-plugin-server` or `ovos-tts-plugin-server`. A relay **cannot** choose the engine, model, or voice. The **hive operator decides**, centrally and uniformly, for every relay that connects.
 - **Speech is authenticated.** STT/TTS are not an open endpoint anyone can hit. Access is gated by the client's HiveMind credentials, exactly like every other message on the protocol.
-- **It is the reference for the b64 speech API.** The relay sends audio for STT and receives speech for TTS as base64-encoded WAV over the HiveMessage bus (`recognizer_loop:b64_transcribe`, `speak:b64_audio`). This is the same work [mic-satellite](https://github.com/JarbasHiveMind/hivemind-mic-satellite) does over the binary protocol. Relay illustrates the b64 path. It could equally use binary.
+- **It is the reference for the b64 speech API.** The relay sends audio for STT as base64-encoded headerless PCM, and receives speech for TTS as a base64-encoded WAV, over the HiveMessage bus (`recognizer_loop:b64_transcribe`, `speak:b64_audio`). This is the same work [mic-satellite](https://github.com/JarbasHiveMind/hivemind-mic-satellite) does over the binary protocol. Relay illustrates the b64 path. It could equally use binary.
 
 Choose voice-relay when you want HiveMind to operate STT/TTS as a **governed, authenticated service**, uniform and centrally controlled, with wakeword kept local for latency and privacy. Lower device resource use is a consequence, not the goal.
 
@@ -122,7 +122,7 @@ Built on [ovos-simple-listener](https://github.com/TigreGotico/ovos-simple-liste
 
 **Present:**
 - Microphone capture, VAD, and wakeword detection, all local
-- Audio forwarded to hivemind-core (hivemind-audio-binary-protocol plugin) for STT, over base64-encoded WAV or the binary protocol (configurable, see below)
+- Audio forwarded to hivemind-core (hivemind-audio-binary-protocol plugin) for STT, over base64-encoded headerless PCM or the binary protocol (configurable, see below)
 - TTS audio synthesised server-side and streamed back for local playback, over the same choice of transports
 - PHAL (platform hardware abstraction) auto-loaded if installed
 - Standard OVOS plugin system for mic, VAD, and wakeword
@@ -194,8 +194,12 @@ its own transport, set independently in `mycroft.conf`:
 ```
 
 Both keys default to `b64`: the utterance recorded locally is sent as
-base64-encoded WAV over `recognizer_loop:b64_transcribe`, and synthesized
-speech comes back the same way over `speak:b64_audio`. This is the transport
+base64-encoded headerless PCM over `recognizer_loop:b64_transcribe`, with
+`sample_rate` and `sample_width` in the same message, and synthesized speech
+comes back as a base64-encoded WAV over `speak:b64_audio`. The STT field
+carries the sample frames only. A container header there is not audio: the
+receiver would transcribe it, which puts a click in front of the utterance
+(HIVEMIND-AUDIO-1 §2). This is the transport
 every prior release used, and it stays the default because it is the simplest
 to reason about and to reproduce in a demo — plain JSON, nothing binary to
 inspect.

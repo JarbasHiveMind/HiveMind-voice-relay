@@ -9,7 +9,7 @@ Device (relay)                          Server (hivemind-core + audio-binary-pro
 ──────────────────────────────          ─────────────────────────────────────
 Microphone → VAD → Wakeword             STT model → Intent / Skills → TTS model
                        │                     ↑                           │
-                       └──── audio (b64 WAV) ─┘                          │
+                       └──── audio (b64 PCM) ─┘                          │
                                                                           │
 Speaker ←────── TTS audio (b64 WAV) ──────────────────────────────────────┘
 ```
@@ -55,8 +55,8 @@ After recording ends, `recognizer_loop:record_end` is emitted, then the audio is
 
 `HiveMindSTT` is a thin `ovos_plugin_manager.templates.stt.STT` subclass. Instead of running a local model, it:
 
-1. Encodes the captured `AudioData` as a base64 WAV string.
-2. Emits `recognizer_loop:b64_transcribe` on the HiveMind bus, carrying `{"audio": "<b64>", "lang": "<lang>"}`.
+1. Encodes the captured `AudioData` frames as a base64 string. The frames are headerless PCM: the STT field carries uncompressed samples, never a container (HIVEMIND-AUDIO-1 §2).
+2. Emits `recognizer_loop:b64_transcribe` on the HiveMind bus, carrying `{"audio": "<b64>", "lang": "<lang>", "sample_rate": 16000, "sample_width": 2}`. The rate and the width describe the frames, because headerless samples do not describe themselves.
 3. Blocks (up to 20 seconds) on a threading `Event`, waiting for `recognizer_loop:b64_transcribe.response` from the server.
 4. Returns the top-ranked transcription string.
 
@@ -125,7 +125,7 @@ This is the part that matters most from a developer's perspective. Beyond moving
 
 **Speech is behind auth.** Because STT/TTS live inside the hive, they inherit the protocol's access-key authentication. They are not an open network service anyone can call. A client must be a credentialed member of the mesh to transcribe or synthesise. A public OVOS plugin server has no such gate. HiveMind makes speech an authenticated capability of the hive itself.
 
-**b64 vs binary: the same job, two transports.** The relay carries audio as base64-encoded WAV over the JSON bus (`b64_transcribe` / `b64_audio`). [mic-satellite](https://github.com/JarbasHiveMind/hivemind-mic-satellite) does the equivalent over the binary protocol (`HiveMessageType.BINARY` / `RAW_AUDIO`), which avoids the roughly 33% base64 overhead. Relay is the reference implementation for the b64 path. It could be built on the binary protocol instead. Choose b64 for simplicity and easy debugging. Choose binary for bandwidth.
+**b64 vs binary: the same job, two transports.** The relay carries STT audio as base64-encoded headerless PCM over the JSON bus, and receives TTS audio there as a WAV (`b64_transcribe` / `b64_audio`). [mic-satellite](https://github.com/JarbasHiveMind/hivemind-mic-satellite) does the equivalent over the binary protocol (`HiveMessageType.BINARY` / `RAW_AUDIO`), which avoids the roughly 33% base64 overhead. Relay is the reference implementation for the b64 path. It could be built on the binary protocol instead. Choose b64 for simplicity and easy debugging. Choose binary for bandwidth.
 
 ## Dependencies
 

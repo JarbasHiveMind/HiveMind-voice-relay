@@ -30,7 +30,9 @@ def get_stt_transport() -> str:
     """Which transport HiveMindSTT uses to hand audio off for STT.
 
     Read from this device's ``mycroft.conf`` as top-level ``stt_transport``.
-    ``"b64"`` (default) sends base64-encoded WAV over ``recognizer_loop:b64_transcribe``.
+    ``"b64"`` (default) sends base64-encoded headerless PCM over
+    ``recognizer_loop:b64_transcribe``, with ``sample_rate`` and
+    ``sample_width`` in the same message (HIVEMIND-AUDIO-1 §2).
     ``"binary"`` sends raw PCM as an ``STT_AUDIO_TRANSCRIBE`` binary HiveMessage.
     Any other value falls back to ``"b64"``.
     """
@@ -178,11 +180,16 @@ class HiveMindSTT(STT):
                                        "sample_width": audio.sample_width})
             self.bus.emit(hm, binary_type=HiveMindBinaryPayloadType.STT_AUDIO_TRANSCRIBE)
         else:
-            wav = audio.get_wav_data()
-            b64audio = pybase64.b64encode(wav).decode("utf-8")
+            # The b64 field carries headerless PCM: receivers build an
+            # AudioData from these bytes with sample_rate and sample_width
+            # taken from the message, so a container header would be
+            # transcribed as audio (HIVEMIND-AUDIO-1 §2).
+            b64audio = pybase64.b64encode(audio.frame_data).decode("utf-8")
             m = dig_for_message() or Message("")
             m = m.forward("recognizer_loop:b64_transcribe",
-                          {"audio": b64audio, "lang": self.lang})
+                          {"audio": b64audio, "lang": self.lang,
+                           "sample_rate": audio.sample_rate,
+                           "sample_width": audio.sample_width})
             self.bus.emit(m)
         self._response.wait(20)
         if self._response.is_set():
