@@ -169,8 +169,16 @@ def test_hivemind_stt_round_trips_b64_transcribe():
 
         assert _wait_for(lambda: len(requests) >= 1), \
             "b64_transcribe never reached the master agent bus"
-        # the relay actually sent base64-encoded WAV audio
-        assert requests[0].data.get("audio"), "no b64 audio in transcribe request"
+        # the relay sent base64-encoded HEADERLESS PCM over a real connection,
+        # with the rate and the width beside it (HIVEMIND-AUDIO-1 §2, panel
+        # decision hivemind-b64-stt-audio-pcm-or-wav = pcm)
+        sent = requests[0].data
+        assert sent.get("audio"), "no b64 audio in transcribe request"
+        audio = _make_audio()
+        assert pybase64.b64decode(sent["audio"]) == audio.frame_data
+        assert not pybase64.b64decode(sent["audio"]).startswith(b"RIFF")
+        assert sent["sample_rate"] == audio.sample_rate
+        assert sent["sample_width"] == audio.sample_width
         assert result == "turn on the lights"
     finally:
         if bus is not None:

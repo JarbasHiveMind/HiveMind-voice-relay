@@ -30,7 +30,9 @@ def get_stt_transport() -> str:
     """Which transport HiveMindSTT uses to hand audio off for STT.
 
     Read from this device's ``mycroft.conf`` as top-level ``stt_transport``.
-    ``"b64"`` (default) sends base64-encoded WAV over ``recognizer_loop:b64_transcribe``.
+    ``"b64"`` (default) sends base64-encoded headerless PCM over
+    ``recognizer_loop:b64_transcribe``, with ``sample_rate`` and
+    ``sample_width`` in the same message (HIVEMIND-AUDIO-1 §2).
     ``"binary"`` sends raw PCM as an ``STT_AUDIO_TRANSCRIBE`` binary HiveMessage.
     Any other value falls back to ``"b64"``.
     """
@@ -178,11 +180,28 @@ class HiveMindSTT(STT):
                                        "sample_width": audio.sample_width})
             self.bus.emit(hm, binary_type=HiveMindBinaryPayloadType.STT_AUDIO_TRANSCRIBE)
         else:
-            wav = audio.get_wav_data()
-            b64audio = pybase64.b64encode(wav).decode("utf-8")
+            # HIVEMIND-AUDIO-1 §2: the audio inside the STT tags "carries
+            # uncompressed PCM samples", and the base64 field is the same
+            # contract — every receiver (hivemind-audio-binary-protocol,
+            # habp-transformer-services, hivemind-wyoming-binary-protocol)
+            # builds an AudioData from these bytes with the rate and the
+            # width taken from the message, which is PCM semantics. So the
+            # frames go on the wire headerless, and the two numbers that
+            # describe them go in the message beside them.
+            #
+            # This sent audio.get_wav_data() until the panel answered
+            # `hivemind-b64-stt-audio-pcm-or-wav` with `pcm`. The 44-byte
+            # RIFF header was transcribed as audio: a click in front of
+            # every utterance, and everything after it shifted by 22
+            # SAMPLES — 44 bytes at 16-bit mono — which is 1.375 ms at
+            # 16 kHz, not 22 ms. Measured on the receiver: 1622 samples
+            # against 1600, 101.38 ms against 100.00 ms.
+            b64audio = pybase64.b64encode(audio.frame_data).decode("utf-8")
             m = dig_for_message() or Message("")
             m = m.forward("recognizer_loop:b64_transcribe",
-                          {"audio": b64audio, "lang": self.lang})
+                          {"audio": b64audio, "lang": self.lang,
+                           "sample_rate": audio.sample_rate,
+                           "sample_width": audio.sample_width})
             self.bus.emit(m)
         self._response.wait(20)
         if self._response.is_set():
