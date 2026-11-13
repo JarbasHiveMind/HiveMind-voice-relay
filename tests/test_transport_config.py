@@ -3,11 +3,12 @@
 Unlike tests/e2e/test_relay_e2e.py (a real HiveMessageBusClient over a real
 loopback hivemind-core), these tests stub the bus client directly to assert,
 in isolation, which wire contract HiveMindSTT / HMPlayback pick for each
-transport setting. The default (no config) must reproduce the exact b64
-behaviour that shipped before this option existed.
+transport setting. The default (no config) uses the b64 transport, whose STT
+field carries headerless PCM with the rate and the width in the message.
 """
 from unittest.mock import MagicMock, patch
 
+import pybase64
 from ovos_bus_client.message import Message
 from speech_recognition import AudioData
 
@@ -51,8 +52,17 @@ def test_stt_default_config_uses_b64_transport():
     assert isinstance(sent, Message)
     assert sent.msg_type == "recognizer_loop:b64_transcribe"
     assert "audio" in sent.data
-    # b64-encoded WAV, not raw PCM
-    assert sent.data["audio"] != _make_audio().frame_data
+
+    # The field decodes to the frames themselves: receivers build an AudioData
+    # from these bytes with the rate and the width from the message, so a
+    # container header would be transcribed as audio.
+    audio = _make_audio()
+    assert pybase64.b64decode(sent.data["audio"]) == audio.frame_data
+    assert not pybase64.b64decode(sent.data["audio"]).startswith(b"RIFF")
+
+    # the two numbers that describe the headerless frames travel with them
+    assert sent.data["sample_rate"] == audio.sample_rate
+    assert sent.data["sample_width"] == audio.sample_width
 
 
 def test_stt_binary_transport_sends_stt_audio_transcribe_frame():
