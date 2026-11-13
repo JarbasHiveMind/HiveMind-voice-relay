@@ -1,0 +1,18 @@
+name: Code Coverage
+
+on:
+  pull_request:
+    branches: [dev]
+  workflow_dispatch:
+
+jobs:
+  coverage:
+    uses: OpenVoiceOS/gh-automations/.github/workflows/coverage.yml@dev
+    with:
+      python_version: '3.11'
+      coverage_source: 'hivemind_voice_relay'
+      test_path: 'tests/'
+      system_deps: 'libasound2-dev'
+      # version policy is in pyproject (the `test` extra); no pre_install pins here.
+      test_extras: 'test'
+      min_coverage: 0
