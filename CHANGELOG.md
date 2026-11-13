@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.2a1](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.4.2a1) (2026-11-13)
+
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.4.1a1...1.4.2a1)
+
+**Merged pull requests:**
+
+- fix\(stt\): the b64 field carries headerless PCM, not a WAV [\#52](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/52) ([openvoiceos-bot](https://github.com/openvoiceos-bot))
+
 ## [1.4.1a1](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.4.1a1) (2026-09-19)
 
 [Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.4.0a2...1.4.1a1)
