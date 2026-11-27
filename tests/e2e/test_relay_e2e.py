@@ -34,6 +34,7 @@ import time
 from unittest.mock import MagicMock, patch
 
 import pybase64
+from json_database import JsonStorage
 from ovos_bus_client.message import Message
 from speech_recognition import AudioData
 
@@ -62,12 +63,12 @@ def _make_audio() -> AudioData:
     return AudioData(frame_data, sample_rate=16000, sample_width=2)
 
 
-def _make_relay_bus(url: str, key: str, password: str,
+def _make_relay_bus(tmp_path, url: str, key: str, password: str,
                     name: str = "voice-relay") -> HiveMessageBusClient:
     """Build the relay's real bus client pointed at the loopback master."""
     host, port = url.replace("ws://", "").rstrip("/").split(":")
     port = int(port)
-    identity = NodeIdentity()
+    identity = NodeIdentity(identity_file=JsonStorage(str(tmp_path / f"{name}.json")))
     identity.access_key = key
     identity.password = password
     identity.default_master = f"ws://{host}"
@@ -149,7 +150,7 @@ def _install_stub_tts_endpoint(master, wav_bytes: bytes = b"RIFFfakewavdata"):
 # STT path — real HiveMindSTT over the wire
 # ---------------------------------------------------------------------------
 
-def test_hivemind_stt_round_trips_b64_transcribe():
+def test_hivemind_stt_round_trips_b64_transcribe(tmp_path):
     """HiveMindSTT.execute() sends b64 audio to the master and returns the
     transcript the (stubbed) server-side STT plugin sends back."""
     from hivemind_voice_relay.service import HiveMindSTT
@@ -160,7 +161,7 @@ def test_hivemind_stt_round_trips_b64_transcribe():
     try:
         requests = _install_stub_stt_endpoint(m, transcript="turn on the lights")
 
-        bus = _make_relay_bus(m.network_protocol.url, "relay-key", "relay-pwd")
+        bus = _make_relay_bus(tmp_path, m.network_protocol.url, "relay-key", "relay-pwd")
         bus.connect(site_id="relay-site")
         bus.wait_for_handshake(timeout=10)
 
@@ -185,7 +186,7 @@ def test_hivemind_stt_round_trips_b64_transcribe():
         b.stop_all()
 
 
-def test_hivemind_stt_timeout_returns_empty():
+def test_hivemind_stt_timeout_returns_empty(tmp_path):
     """With no server-side STT plugin answering, HiveMindSTT.execute() times out
     and returns an empty string rather than hanging."""
     from hivemind_voice_relay.service import HiveMindSTT
@@ -194,7 +195,7 @@ def test_hivemind_stt_timeout_returns_empty():
     b.start_all()
     bus = None
     try:
-        bus = _make_relay_bus(m.network_protocol.url, "relay-key", "relay-pwd")
+        bus = _make_relay_bus(tmp_path, m.network_protocol.url, "relay-key", "relay-pwd")
         bus.connect(site_id="relay-site")
         bus.wait_for_handshake(timeout=10)
 
@@ -213,7 +214,7 @@ def test_hivemind_stt_timeout_returns_empty():
 # Utterance injection — real HMCallbacks over the wire
 # ---------------------------------------------------------------------------
 
-def test_callbacks_text_callback_injects_utterance():
+def test_callbacks_text_callback_injects_utterance(tmp_path):
     """HMCallbacks.text_callback emits recognizer_loop:utterance and it reaches
     the master's agent bus (the wakeword→STT→inject hop)."""
     from hivemind_voice_relay.service import HMCallbacks
@@ -222,7 +223,7 @@ def test_callbacks_text_callback_injects_utterance():
     b.start_all()
     bus = None
     try:
-        bus = _make_relay_bus(m.network_protocol.url, "relay-key", "relay-pwd")
+        bus = _make_relay_bus(tmp_path, m.network_protocol.url, "relay-key", "relay-pwd")
         bus.connect(site_id="relay-site")
         bus.wait_for_handshake(timeout=10)
 
@@ -267,7 +268,7 @@ def _build_playback(bus):
     return pb
 
 
-def test_tts_request_and_playback_queue():
+def test_tts_request_and_playback_queue(tmp_path):
     """execute_tts emits speak:b64_audio to the master; the stubbed server-side
     TTS plugin answers speak:b64_audio.response and HMPlayback queues the audio
     for local playback."""
@@ -285,7 +286,7 @@ def test_tts_request_and_playback_queue():
 
         requests = _install_stub_tts_endpoint(m, wav_bytes=b"RIFF....WAVEdata")
 
-        bus = _make_relay_bus(m.network_protocol.url, "relay-key", "relay-pwd")
+        bus = _make_relay_bus(tmp_path, m.network_protocol.url, "relay-key", "relay-pwd")
         bus.connect(site_id="relay-site")
         bus.wait_for_handshake(timeout=10)
 
@@ -318,7 +319,7 @@ def test_tts_request_and_playback_queue():
 # Full relay assembly — mic/VAD/wakeword mocked, bus + STT real
 # ---------------------------------------------------------------------------
 
-def test_relay_assembles_with_mocked_capture():
+def test_relay_assembles_with_mocked_capture(tmp_path):
     """HiveMindVoiceRelay builds end-to-end with mocked mic/VAD/wakeword and a
     real bus, wiring a real HiveMindSTT — no real audio device is opened."""
     import hivemind_voice_relay.service as svc
@@ -327,7 +328,7 @@ def test_relay_assembles_with_mocked_capture():
     b.start_all()
     bus = None
     try:
-        bus = _make_relay_bus(m.network_protocol.url, "relay-key", "relay-pwd")
+        bus = _make_relay_bus(tmp_path, m.network_protocol.url, "relay-key", "relay-pwd")
         bus.connect(site_id="relay-site")
         bus.wait_for_handshake(timeout=10)
 
