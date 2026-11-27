@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.2a2](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.4.2a2) (2026-11-27)
+
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.4.2a1...1.4.2a2)
+
+**Merged pull requests:**
+
+- test: the e2e relay client keeps its identity in a tmp file [\#55](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/55) ([openvoiceos-bot](https://github.com/openvoiceos-bot))
+
 ## [1.4.2a1](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.4.2a1) (2026-11-13)
 
 [Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.4.1a1...1.4.2a1)
@@ -122,19 +130,19 @@
 
 ## [1.1.0a1](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.1.0a1) (2026-06-05)
 
-[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.0.4a1...1.1.0a1)
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.0.4a2...1.1.0a1)
 
 **Merged pull requests:**
 
 - feat: modernize deps, CI to gh-automations@dev, ACL e2e tests [\#20](https://github.com/JarbasHiveMind/HiveMind-voice-relay/pull/20) ([JarbasAl](https://github.com/JarbasAl))
 
-## [1.0.4a1](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.0.4a1) (2026-02-03)
-
-[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.0.4a2...1.0.4a1)
-
 ## [1.0.4a2](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.0.4a2) (2026-02-03)
 
-[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.0.3...1.0.4a2)
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.0.4a1...1.0.4a2)
+
+## [1.0.4a1](https://github.com/JarbasHiveMind/HiveMind-voice-relay/tree/1.0.4a1) (2026-02-03)
+
+[Full Changelog](https://github.com/JarbasHiveMind/HiveMind-voice-relay/compare/1.0.3...1.0.4a1)
 
 **Merged pull requests:**
 
