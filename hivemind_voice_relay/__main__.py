@@ -35,7 +35,7 @@ def connect(host, key, password, port, selfsigned, siteid):
     """
     init_service_logger("HiveMind-voice-relay")
 
-    identity = NodeIdentity()
+    identity = NodeIdentity(app_name="voice-relay")
     password = password or identity.password
     key = key or identity.access_key
     siteid = siteid or identity.site_id or "unknown"
@@ -60,7 +60,8 @@ def connect(host, key, password, port, selfsigned, siteid):
                                port=port,
                                host=host,
                                useragent="VoiceRelayV1.0.0",
-                               self_signed=selfsigned)
+                               self_signed=selfsigned,
+                               identity=identity)
     bus.connect(site_id=siteid)
 
     # STT listener thread
